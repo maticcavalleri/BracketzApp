@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BracketzApp.Models
 {
     public class Tournament
     {
+        [Key]
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -17,8 +19,5 @@ namespace BracketzApp.Models
 
         [ForeignKey("TournamentFormat")]
         public TournamentFormat TournamentFormat { get; set; }
-        
-        [ForeignKey("Bracket")]
-        public Bracket[] Brackets { get; set; }
     }
 }
