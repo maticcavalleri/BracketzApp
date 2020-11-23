@@ -10,9 +10,14 @@ Use the scaffolding tool to produce Create, Read, Update, and Delete (CRUD) page
 
 appsettings.json:
 ```
-"ConnectionStrings": {
-    "BracketsAppContext": "Data Source=BracketsApp.db"
-}
+ "ConnectionStrings": {
+   "DefaultConnection": "DataSource=app.db;Cache=Shared"
+ },
+```
+
+Startup.cs:
+```
+options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
 ```
 
 ### Production
