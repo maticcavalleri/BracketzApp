@@ -3,10 +3,10 @@
 
 ## Scaffolding models  
 Use the scaffolding tool to produce Create, Read, Update, and Delete (CRUD) pages for a model:  
-`dotnet aspnet-codegenerator controller -name SomeModelController -m SomeModel -dc BracketsAppContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries`
+`dotnet aspnet-codegenerator controller -name SomeModelController -m SomeModel -dc BracketsAppContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries -f`
 
 ## Database
-### Development
+### Development (SQLite)
 
 appsettings.json:
 ```
