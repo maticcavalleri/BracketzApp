@@ -28,7 +28,19 @@ namespace BracketzApp.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Tournament.Include(t => t.TournamentFormat).Include(t => t.User);
-            return View(await applicationDbContext.ToListAsync());
+            var tournamentList = await applicationDbContext.ToListAsync();
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            IDictionary<int, bool> ownsTournament = new Dictionary<int, bool>();
+            foreach (var tournament in tournamentList)
+            {
+                var isOwner = tournament.UserId == currentUser.Id ? true : false; 
+                ownsTournament.Add(tournament.Id, isOwner);
+            }
+
+            ViewBag.ownsTournament = ownsTournament;
+
+            return View(tournamentList);
         }
 
         // GET: Tournament/Details/5
@@ -88,10 +100,13 @@ namespace BracketzApp.Controllers
             }
 
             var tournament = await _context.Tournament.FindAsync(id);
-            if (tournament == null)
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (tournament == null || tournament.User != currentUser)
             {
                 return NotFound();
             }
+
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
             return View(tournament);
         }
@@ -136,6 +151,7 @@ namespace BracketzApp.Controllers
         // GET: Tournament/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
             if (id == null)
             {
                 return NotFound();
@@ -145,7 +161,8 @@ namespace BracketzApp.Controllers
                 .Include(t => t.TournamentFormat)
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (tournament == null)
+                
+            if (tournament == null || tournament.User != currentUser)
             {
                 return NotFound();
             }
