@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
+using System.Diagnostics;
 
 namespace BracketzApp.Controllers
 {
@@ -61,6 +62,17 @@ namespace BracketzApp.Controllers
             {
                 return NotFound();
             }
+
+            var teams = _context.Team
+                .Where(m => m.TournamentId == id)
+                .ToList();
+
+            ViewBag.teams = teams;
+
+            /* foreach (var team in teams)
+            {
+                Debug.WriteLine(team.Name);
+            } */
 
             return View(tournament);
         }
