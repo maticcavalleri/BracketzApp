@@ -67,6 +67,8 @@ namespace BracketzApp.Controllers
                 .Where(m => m.TournamentId == id)
                 .ToList();
 
+            ViewBag.teams = teams;
+
             /* foreach (var team in teams)
             {
                 Debug.WriteLine(team.Name);
