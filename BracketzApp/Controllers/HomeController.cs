@@ -19,11 +19,6 @@ namespace BracketzApp.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-        
         // works but does not load models from db if called this way
         // public IActionResult Team()
         // {

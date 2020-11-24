@@ -9,6 +9,8 @@ using BracketzApp.Data;
 using BracketzApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 
 namespace BracketzApp.Controllers
 {
@@ -77,6 +79,12 @@ namespace BracketzApp.Controllers
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
 
             return View();
+        }
+
+        public async Task Join(int? id)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var currentUserId = currentUser.Id;
         }
 
         // GET: Tournament/Edit/5
