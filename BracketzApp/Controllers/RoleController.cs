@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using BracketzApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Identity.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class RoleController : Controller
     {
         private RoleManager<IdentityRole> roleManager;
