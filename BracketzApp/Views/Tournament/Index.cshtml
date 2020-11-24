@@ -1,13 +1,13 @@
 @model IEnumerable<BracketzApp.Models.Tournament>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tournaments";
 }
 
-<h1>Index</h1>
+<h1>Tournaments</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create new tournament</a>
 </p>
 <table class="table">
     <thead>
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Game)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
+                @Html.DisplayFor(modelItem => item.User.UserName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Date)

@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BracketzApp.Controllers
 {
     public class TournamentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private UserManager<IdentityUser> _userManager;
 
-        public TournamentController(ApplicationDbContext context)
+        public TournamentController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
         {
             _context = context;
+            _userManager = userMgr;
         }
 
         // GET: Tournament
@@ -61,6 +64,9 @@ namespace BracketzApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,NOfGames,Game,UserId,Date,TournamentFormatId")] Tournament tournament)
         {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            tournament.UserId = currentUser.Id;
+
             if (ModelState.IsValid)
             {
                 _context.Add(tournament);
@@ -68,8 +74,8 @@ namespace BracketzApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", tournament.UserId);
-            return View(tournament);
+
+            return View();
         }
 
         // GET: Tournament/Edit/5
@@ -86,7 +92,6 @@ namespace BracketzApp.Controllers
                 return NotFound();
             }
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", tournament.UserId);
             return View(tournament);
         }
 
