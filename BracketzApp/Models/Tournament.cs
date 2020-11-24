@@ -17,7 +17,7 @@ namespace BracketzApp.Models
         public string Name { get; set; }
 
         [Required]
-        [DisplayName("Best of (Number of games per bracket)")]
+        [DisplayName("Best of")]
         public int NOfGames { get; set; }
 
         [Required]

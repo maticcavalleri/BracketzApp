@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BracketzApp.Controllers
 {
     public class TeamController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public TeamController(ApplicationDbContext context)
+        private UserManager<IdentityUser> _userManager;
+        
+        public TeamController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
         {
             _context = context;
+            _userManager = userMgr;
         }
 
         // GET: Team
@@ -56,6 +59,9 @@ namespace BracketzApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TeamId,Name,Description")] Team team)
         {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            team.OwnerId = currentUser.Id;
+            
             if (ModelState.IsValid)
             {
                 _context.Add(team);

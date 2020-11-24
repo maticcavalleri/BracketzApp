@@ -93,10 +93,16 @@ namespace BracketzApp.Controllers
             return View();
         }
 
-        public async Task Join(int? id)
+        public async Task<IActionResult> Join(int? id)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            var currentUserId = currentUser.Id;
+            var myTeam = await _context.Team.FirstOrDefaultAsync(x => x.OwnerId == currentUser.Id);
+            if (myTeam != null)
+            {
+                myTeam.TournamentId = id;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
         }
 
         // GET: Tournament/Edit/5

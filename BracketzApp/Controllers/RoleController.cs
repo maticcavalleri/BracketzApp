@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using BracketzApp.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Identity.Controllers
+namespace BracketzApp.Controllers
 {
     [Authorize(Roles = "Administrator")]
     public class RoleController : Controller
