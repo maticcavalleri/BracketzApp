@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BracketzApp.Controllers
 {
+    [Authorize]
     public class TournamentController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -53,7 +55,6 @@ namespace BracketzApp.Controllers
         public IActionResult Create()
         {
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
