@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BracketzApp.Models;
@@ -27,6 +23,12 @@ namespace BracketzApp.Controllers
         {
             return View();
         }
+        
+        // works but does not load models from db if called this way
+        // public IActionResult Team()
+        // {
+        //     return View("../Team/Index");
+        // }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
