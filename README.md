@@ -1,3 +1,11 @@
+# BracketzApp
+63180149 Nik Klavžar  
+63180064 Matic Cavalleri
+
+Trenutno na trgu ne obstaja nobena preprosta in dobra aplikacija za ustvarjanje ekip, turnirjev in turnirskih dreves. V trenutnih mračnih časih se velikokrat znajdemo zvečer doma in se želimo s prijatelji pomeriti v naši najljubši spletni igri, kot je na primer šah. Ampak, ker igro lahko igrata samo dve osebi hkrati, vi pa bi si želeli tekmovati z vsemi, ste primorani sami določiti kdo najprej igra s kom, in kako bo potekal vaš mini turnirček. To vam vzame čas, poleg tega pa nekateri od vas ne bodo zadovoljni s svojimi tekmeci.
+Lahko ste s prijatelji na igrišču, kjer želite igrati košarko, ampak ne veste kako bi se razdelili v dve ekipi. Ko bi le imeli aplikacijo, ki bi glede na informacije o kvaliteti igralcev to storila za vas.
+
+-----
 ## Run the app
 `dotnet watch run`  
 
