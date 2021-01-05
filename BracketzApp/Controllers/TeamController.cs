@@ -14,9 +14,9 @@ namespace BracketzApp.Controllers
     public class TeamController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private UserManager<IdentityUser> _userManager;
+        private UserManager<ApplicationUser> _userManager;
         
-        public TeamController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
+        public TeamController(ApplicationDbContext context, UserManager<ApplicationUser> userMgr)
         {
             _context = context;
             _userManager = userMgr;

@@ -19,9 +19,9 @@ namespace BracketzApp.Controllers
     public class TournamentController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private UserManager<IdentityUser> _userManager;
+        private UserManager<ApplicationUser> _userManager;
 
-        public TournamentController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
+        public TournamentController(ApplicationDbContext context, UserManager<ApplicationUser> userMgr)
         {
             _context = context;
             _userManager = userMgr;

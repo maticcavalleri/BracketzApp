@@ -18,7 +18,7 @@ namespace BracketzApp.Models
         public string OwnerId { get; set; }
         
         [ForeignKey("OwnerId")]
-        public virtual IdentityUser IdentityUser { get; set; }
+        public virtual ApplicationUser IdentityUser { get; set; }
         
         public int? TournamentId { get; set; }
         

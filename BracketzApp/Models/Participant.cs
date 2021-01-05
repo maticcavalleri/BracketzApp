@@ -19,7 +19,7 @@ namespace BracketzApp.Models
         
         public string UserId { get; set; }
         [ForeignKey("UserId")]
-        public IdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
 
         public int TeamId { get; set; }
         [ForeignKey("TeamId")]

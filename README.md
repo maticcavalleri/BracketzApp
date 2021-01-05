@@ -14,6 +14,10 @@ Use the scaffolding tool to produce Create, Read, Update, and Delete (CRUD) page
 ```
 dotnet aspnet-codegenerator controller -name SomeModelController -m SomeModel -dc BracketsAppContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries -f
 ```
+Scaffolding Identity pages (Account.Login, Account.Register, ...)
+```
+dotnet aspnet-codegenerator identity -dc BracketzApp.Data.ApplicationDbContext --files "Account.Login" --force
+```
 
 ## Database
 ### Development (SQLite)
