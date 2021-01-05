@@ -38,7 +38,8 @@ namespace BracketzApp
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-                //.AddDefaultTokenProviders();
+            //.AddDefaultTokenProviders();
+            services.AddControllers();
             services.AddControllersWithViews();
             services.AddRazorPages();
 
