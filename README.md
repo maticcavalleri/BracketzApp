@@ -12,7 +12,7 @@ Lahko ste s prijatelji na igrišču, kjer želite igrati košarko, ampak ne vest
 ## Scaffolding models  
 Use the scaffolding tool to produce Create, Read, Update, and Delete (CRUD) pages (Views, Controllers) for a model:  
 ```
-dotnet aspnet-codegenerator controller -name SomeModelController -m SomeModel -dc BracketsAppContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries -f
+dotnet aspnet-codegenerator controller -name SomeModelController -m SomeModel -dc BracketzApp.Data.ApplicationDbContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries [-api]
 ```
 Scaffolding Identity pages (Account.Login, Account.Register, ...)
 ```
