@@ -27,7 +27,6 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
-        [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -67,7 +66,6 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
