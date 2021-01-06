@@ -12,11 +12,11 @@ namespace BracketzApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamControllerApi : ControllerBase
+    public class TeamApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public TeamControllerApi(ApplicationDbContext context)
+        public TeamApiController(ApplicationDbContext context)
         {
             _context = context;
         }

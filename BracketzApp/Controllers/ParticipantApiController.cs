@@ -12,47 +12,47 @@ namespace BracketzApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BracketControllerApi : ControllerBase
+    public class ParticipantApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public BracketControllerApi(ApplicationDbContext context)
+        public ParticipantApiController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/BracketControllerApi
+        // GET: api/ParticipantControllerApi
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Bracket>>> GetBracket()
+        public async Task<ActionResult<IEnumerable<Participant>>> GetParticipant()
         {
-            return await _context.Bracket.ToListAsync();
+            return await _context.Participant.ToListAsync();
         }
 
-        // GET: api/BracketControllerApi/5
+        // GET: api/ParticipantControllerApi/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Bracket>> GetBracket(int id)
+        public async Task<ActionResult<Participant>> GetParticipant(int id)
         {
-            var bracket = await _context.Bracket.FindAsync(id);
+            var participant = await _context.Participant.FindAsync(id);
 
-            if (bracket == null)
+            if (participant == null)
             {
                 return NotFound();
             }
 
-            return bracket;
+            return participant;
         }
 
-        // PUT: api/BracketControllerApi/5
+        // PUT: api/ParticipantControllerApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBracket(int id, Bracket bracket)
+        public async Task<IActionResult> PutParticipant(int id, Participant participant)
         {
-            if (id != bracket.Id)
+            if (id != participant.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(bracket).State = EntityState.Modified;
+            _context.Entry(participant).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace BracketzApp.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BracketExists(id))
+                if (!ParticipantExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace BracketzApp.Controllers
             return NoContent();
         }
 
-        // POST: api/BracketControllerApi
+        // POST: api/ParticipantControllerApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Bracket>> PostBracket(Bracket bracket)
+        public async Task<ActionResult<Participant>> PostParticipant(Participant participant)
         {
-            _context.Bracket.Add(bracket);
+            _context.Participant.Add(participant);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBracket", new { id = bracket.Id }, bracket);
+            return CreatedAtAction("GetParticipant", new { id = participant.Id }, participant);
         }
 
-        // DELETE: api/BracketControllerApi/5
+        // DELETE: api/ParticipantControllerApi/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBracket(int id)
+        public async Task<IActionResult> DeleteParticipant(int id)
         {
-            var bracket = await _context.Bracket.FindAsync(id);
-            if (bracket == null)
+            var participant = await _context.Participant.FindAsync(id);
+            if (participant == null)
             {
                 return NotFound();
             }
 
-            _context.Bracket.Remove(bracket);
+            _context.Participant.Remove(participant);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool BracketExists(int id)
+        private bool ParticipantExists(int id)
         {
-            return _context.Bracket.Any(e => e.Id == id);
+            return _context.Participant.Any(e => e.Id == id);
         }
     }
 }

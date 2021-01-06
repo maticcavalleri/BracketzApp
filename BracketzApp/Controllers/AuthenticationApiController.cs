@@ -16,11 +16,11 @@ namespace BracketzApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationApiController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private IConfiguration _config;
-        public AuthenticationController(UserManager<ApplicationUser> userManager, IConfiguration config)
+        public AuthenticationApiController(UserManager<ApplicationUser> userManager, IConfiguration config)
         {
             _userManager = userManager;
             _config = config;

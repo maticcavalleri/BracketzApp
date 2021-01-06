@@ -17,12 +17,12 @@ namespace BracketzApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TournamentControllerApi : ControllerBase
+    public class TournamentApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
 
-        public TournamentControllerApi(ApplicationDbContext context, UserManager<ApplicationUser> userMgr)
+        public TournamentApiController(ApplicationDbContext context, UserManager<ApplicationUser> userMgr)
         {
             _context = context;
             _userManager = userMgr;
