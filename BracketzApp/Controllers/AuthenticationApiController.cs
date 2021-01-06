@@ -11,7 +11,11 @@ using BracketzApp.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-
+using BracketzApp.Data;
+using BracketzApp.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging;
 namespace BracketzApp.Controllers
 {
     [AllowAnonymous]
@@ -20,50 +24,61 @@ namespace BracketzApp.Controllers
     public class AuthenticationApiController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private IConfiguration _config;
-        public AuthenticationApiController(UserManager<ApplicationUser> userManager, IConfiguration config)
+        private readonly ApplicationDbContext _context;
+        private TokenService _tokenHelper;
+        private readonly ILogger<AuthenticationApiController> _logger;
+        public AuthenticationApiController(
+            ApplicationDbContext context, 
+            IConfiguration config, 
+            UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager, 
+            TokenService tokenHelper,
+            ILogger<AuthenticationApiController> logger)
         {
-            _userManager = userManager;
+            _context = context;
             _config = config;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _tokenHelper = tokenHelper;
+            _logger = logger;
         }
 
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var userRoles = await _userManager.GetRolesAsync(user);
+            if (ModelState.IsValid) {
+                var signIn = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
+                _logger.LogInformation(User.Identity.Name);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+                if (signIn.Succeeded) {
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                    {
+                        string token = await _tokenHelper.GenerateToken(user);
+                        user.RefreshToken = Guid.NewGuid().ToString();
+                        await _userManager.UpdateAsync(user);
 
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                    authClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+                        CookieOptions cookieOptions = new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict };
+
+                        Response?.Cookies.Append("X-Access-Token", token, cookieOptions);
+                        Response?.Cookies.Append("X-Username", user.UserName, cookieOptions);
+                        Response?.Cookies.Append("X-Refresh-Token", user.RefreshToken, cookieOptions);
+
+                        return Ok(new
+                        {
+                            username = user.UserName,
+                            email = user.Email,
+                            token = token
+                        });
+                    } else {
+                        return BadRequest(ModelState);
+                    }
                 }
-
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
-
-                var token = new JwtSecurityToken(
-                    issuer: _config["JWT:ValidIssuer"],
-                    audience: _config["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddHours(3),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                    );
-
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
-                });
             }
+            
             return Unauthorized();
         }
 
@@ -86,6 +101,29 @@ namespace BracketzApp.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [HttpGet]
+        [Route("Refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            if (!(Request.Cookies.TryGetValue("X-Username", out var userName) && Request.Cookies.TryGetValue("X-Refresh-Token", out var refreshToken)))
+                return BadRequest();
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            if (user == null)
+                return BadRequest();
+
+            var token = await _tokenHelper.GenerateToken(user);
+            user.RefreshToken = Guid.NewGuid().ToString();
+            await _userManager.UpdateAsync(user);
+
+            Response?.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response?.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response?.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+
+            return Ok();
         }
     }
 }

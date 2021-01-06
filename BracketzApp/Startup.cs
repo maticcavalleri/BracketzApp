@@ -18,6 +18,9 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using BracketzApp.Models;
+using BracketzApp.Services;
+using BracketzApp.Controllers;
+using Microsoft.AspNetCore.Http;
 
 namespace BracketzApp
 {
@@ -50,25 +53,22 @@ namespace BracketzApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             //.AddDefaultTokenProviders();
             
-            services.AddControllers(config => 
-            {
-                var authPolicy = new AuthorizationPolicyBuilder()
+            var authPolicy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
-                config.Filters.Add(new AuthorizeFilter(authPolicy));
-            });
-            /* services.AddControllersWithViews(config =>
+            services.AddControllersWithViews(config =>
             {
                 config.Filters.Add(new AuthorizeFilter(authPolicy));
-            }); */
+            });
             services.AddRazorPages();
 
-            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(Configuration["JWT:Key"]);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -82,7 +82,24 @@ namespace BracketzApp
                     ValidateAudience = false
                 };
 
+                options.Events = new JwtBearerEvents();
+                options.Events.OnMessageReceived = (context => {
+                    if (context.Request.Cookies.ContainsKey("X-Access-Token")) {
+                        context.Token = context.Request.Cookies["X-Access-Token"];
+                    }
+
+                    return Task.CompletedTask;
+                });
+            })
+            .AddCookie(options =>
+            {
+                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.IsEssential = true;
             });
+
+            services.AddScoped<TokenService>();
+            services.AddScoped<AuthenticationApiController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using BracketzApp.Controllers;
-using System.Net.Http;
-using System.Text.Json;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 
 namespace BracketzApp.Areas.Identity.Pages.Account
@@ -25,14 +22,17 @@ namespace BracketzApp.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private AuthenticationApiController _authenticationApi;
         private readonly ILogger<LoginModel> _logger;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            AuthenticationApiController authenticationApi)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _authenticationApi = authenticationApi;
             _logger = logger;
         }
 
@@ -83,35 +83,19 @@ namespace BracketzApp.Areas.Identity.Pages.Account
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         
+
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                using (var httpClient = new HttpClient())
-                {
-                    string data = $"{{Username: {Input.Email}, Password: {Input.Password}}}";
-                    string contents = JsonSerializer.Serialize(data);
-                    using (var response = await httpClient.PostAsync("http://localhost:5001/api/AuthenticationApi/login", new StringContent(contents, Encoding.UTF8, "application/json")))
-                    {
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        _logger.LogDebug(apiResponse);
-                        HttpContext.Session.SetString("JWToken", apiResponse);
-                    }
-                }
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                Models.LoginModel loginModel = new Models.LoginModel();
+                loginModel.Username = Input.Email;
+                loginModel.Password = Input.Password;
+                var result = await _authenticationApi.Login(loginModel);
+                if (result is OkObjectResult success)
                 {
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
                 }
                 else
                 {
