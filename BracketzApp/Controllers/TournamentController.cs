@@ -15,7 +15,6 @@ using System.Diagnostics;
 
 namespace BracketzApp.Controllers
 {
-    [Authorize]
     public class TournamentController : Controller
     {
         private readonly ApplicationDbContext _context;

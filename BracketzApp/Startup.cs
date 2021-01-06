@@ -15,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using BracketzApp.Models;
 
 namespace BracketzApp
@@ -36,11 +38,29 @@ namespace BracketzApp
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             //.AddDefaultTokenProviders();
-            services.AddControllers();
-            services.AddControllersWithViews();
+            
+            services.AddControllers(config => 
+            {
+                var authPolicy = new AuthorizationPolicyBuilder()
+                         .RequireAuthenticatedUser()
+                         .Build();
+                config.Filters.Add(new AuthorizeFilter(authPolicy));
+            });
+            /* services.AddControllersWithViews(config =>
+            {
+                config.Filters.Add(new AuthorizeFilter(authPolicy));
+            }); */
             services.AddRazorPages();
 
             var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
@@ -87,6 +107,8 @@ namespace BracketzApp
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

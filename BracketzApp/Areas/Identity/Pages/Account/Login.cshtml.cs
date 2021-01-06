@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using BracketzApp.Controllers;
+using System.Net.Http;
+using System.Text.Json;
+using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace BracketzApp.Areas.Identity.Pages.Account
 {
@@ -82,6 +87,17 @@ namespace BracketzApp.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                using (var httpClient = new HttpClient())
+                {
+                    string data = $"{{Username: {Input.Email}, Password: {Input.Password}}}";
+                    string contents = JsonSerializer.Serialize(data);
+                    using (var response = await httpClient.PostAsync("http://localhost:5001/api/AuthenticationApi/login", new StringContent(contents, Encoding.UTF8, "application/json")))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        _logger.LogDebug(apiResponse);
+                        HttpContext.Session.SetString("JWToken", apiResponse);
+                    }
+                }
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {

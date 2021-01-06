@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BracketzApp.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthenticationApiController : ControllerBase
@@ -27,6 +28,7 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
+        [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -66,6 +68,7 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
+        [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
