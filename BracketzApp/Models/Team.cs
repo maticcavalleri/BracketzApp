@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ namespace BracketzApp.Models
         public string OwnerId { get; set; }
         
         [ForeignKey("OwnerId")]
+        [DisplayName("Team owner")]
         public virtual IdentityUser IdentityUser { get; set; }
         
         public virtual IEnumerable<BracketTeam> BracketTeam { get; set; }

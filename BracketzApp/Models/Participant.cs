@@ -12,10 +12,12 @@ namespace BracketzApp.Models
         public int Id { get; set; }
 
         [Required]
+        [DisplayName("Username")]
         public string Name { get; set; }
 
         [Required]
         [DefaultValue(1000)]
+        [DisplayName("Rating")]
         public int EloRating { get; set; }
         
         public string UserId { get; set; }

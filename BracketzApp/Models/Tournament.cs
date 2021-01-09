@@ -13,7 +13,7 @@ namespace BracketzApp.Models
         public int Id { get; set; }
 
         [Required]
-        [DisplayName("Name of the Tournament")]
+        [DisplayName("Tournament title")]
         public string Name { get; set; }
 
         [Required]
@@ -21,11 +21,13 @@ namespace BracketzApp.Models
         public int NOfGames { get; set; }
 
         [Required]
+        [DisplayName("Game title")]
         public string Game { get; set; }
 
         public string UserId { get; set; }
         
         [ForeignKey("UserId")]
+        [DisplayName("Tournament Creator")]
         public IdentityUser User { get; set; }
 
         [Required]
