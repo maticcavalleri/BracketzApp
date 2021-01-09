@@ -12,10 +12,12 @@ namespace BracketzApp.Models
 
         [Required]
         [DefaultValue(0)]
+        [DisplayName("Team 1 Score")]
         public int ScoreTeam1 { get; set; }
 
         [Required]
         [DefaultValue(0)]
+        [DisplayName("Team 2 Score")]
         public int ScoreTeam2 { get; set; }
 
         [Required] 

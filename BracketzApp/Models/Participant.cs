@@ -12,19 +12,18 @@ namespace BracketzApp.Models
         public int Id { get; set; }
 
         [Required]
+        [DisplayName("Username")]
         public string Name { get; set; }
 
         [Required]
         [DefaultValue(1000)]
+        [DisplayName("Rating")]
         public int EloRating { get; set; }
         
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
-        public int TeamId { get; set; }
-        [ForeignKey("TeamId")]
-        public Team Team { get; set; }
         public virtual IEnumerable<ParticipantTeam> ParticipantTeam { get; set; }
     }
 }
