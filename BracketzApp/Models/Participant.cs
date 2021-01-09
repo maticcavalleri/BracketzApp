@@ -24,9 +24,6 @@ namespace BracketzApp.Models
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }
 
-        public int TeamId { get; set; }
-        [ForeignKey("TeamId")]
-        public Team Team { get; set; }
         public virtual IEnumerable<ParticipantTeam> ParticipantTeam { get; set; }
     }
 }

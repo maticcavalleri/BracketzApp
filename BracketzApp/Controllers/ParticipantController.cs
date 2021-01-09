@@ -22,7 +22,7 @@ namespace BracketzApp.Controllers
         // GET: Participant
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Participant.Include(p => p.Team).Include(p => p.User);
+            var applicationDbContext = _context.Participant.Include(p => p.User);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,6 @@ namespace BracketzApp.Controllers
             }
 
             var participant = await _context.Participant
-                .Include(p => p.Team)
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (participant == null)
@@ -49,7 +48,6 @@ namespace BracketzApp.Controllers
         // GET: Participant/Create
         public IActionResult Create()
         {
-            ViewData["TeamId"] = new SelectList(_context.Team, "TeamId", "Name");
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
@@ -59,7 +57,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,EloRating,UserId,TeamId")] Participant participant)
+        public async Task<IActionResult> Create([Bind("Id,Name,EloRating,UserId")] Participant participant)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +65,6 @@ namespace BracketzApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TeamId"] = new SelectList(_context.Team, "TeamId", "Name", participant.TeamId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", participant.UserId);
             return View(participant);
         }
@@ -85,7 +82,6 @@ namespace BracketzApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["TeamId"] = new SelectList(_context.Team, "TeamId", "Name", participant.TeamId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", participant.UserId);
             return View(participant);
         }
@@ -95,7 +91,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,EloRating,UserId,TeamId")] Participant participant)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,EloRating,UserId")] Participant participant)
         {
             if (id != participant.Id)
             {
@@ -122,7 +118,6 @@ namespace BracketzApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TeamId"] = new SelectList(_context.Team, "TeamId", "Name", participant.TeamId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", participant.UserId);
             return View(participant);
         }
@@ -136,7 +131,6 @@ namespace BracketzApp.Controllers
             }
 
             var participant = await _context.Participant
-                .Include(p => p.Team)
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (participant == null)
