@@ -116,6 +116,30 @@ namespace BracketzApp.Controllers
             }
             return RedirectToAction("Index");
         }
+        
+        public async Task<IActionResult> Inspect(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tournament = await _context.Tournament
+                .Include(t => t.TournamentFormat)
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (tournament == null)
+            {
+                return NotFound();
+            }
+
+            var teams = _context.Team
+                .Where(m => m.TournamentId == id)
+                .ToList();
+
+            ViewBag.teams = teams;
+            return View(tournament);
+        }
 
         // GET: Tournament/Edit/5
         public async Task<IActionResult> Edit(int? id)

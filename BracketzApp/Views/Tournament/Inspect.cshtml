@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Routing
+@model BracketzApp.Models.Tournament
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+<h2>Tournament</h2>
+
+<h3>Signed up teams:</h3>
+@foreach (var team in ViewBag.teams)
+{
+    <div>
+        <a href="@Url.Action("Details", "Team", new RouteValueDictionary{ {"id", @team.TeamId} } )">@team.Name</a>
+    </div>
+}
+<button>Start tournament</button>
+<canvas id="canvas" width="1200" height="800">
+    
+</canvas>  
