@@ -18,6 +18,9 @@ namespace BracketzApp.Models
         [DefaultValue(0)]
         public int ScoreTeam2 { get; set; }
 
+        [Required] 
+        public int Index { get; set; }
+
         public int? TournamentId { get; set; }
         [ForeignKey("TournamentId")]
         public virtual Tournament Tournament { get; set; }
