@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BracketzApp.CustomClasses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -67,10 +68,58 @@ namespace BracketzApp.Controllers
             var teams = _context.TournamentTeam
                 .Where(m => m.TournamentId == id)
                 .ToList();
-
+            
             ViewBag.teams = teams;
+            ViewBag.tournament = tournament;
 
+            // when you click details tournament starts and initial brackets are made
+            await InitialBrackets(id);
+            
             return View(tournament);
+        }
+
+        public async Task InitialBrackets(int? id)
+        {
+            var teams = _context.TournamentTeam
+                .Where(m => m.TournamentId == id)
+                .ToList();
+            
+            var brackets = new Dictionary<int, Bracket>();
+            for (var i = teams.Count - 2; i >= 0; i--)
+            {
+                var parentId = (i == 0) ? -1 : (i - 1) / 2;
+                var bracket = new Bracket()
+                {
+                    Index = i,
+                    ParentId = parentId,
+                    TournamentId = id,
+                };
+                brackets.Add(i, bracket);
+                await _context.Bracket.AddAsync(bracket);
+                await _context.SaveChangesAsync();
+            }
+            
+            // generateInitialBrackets
+            var j = 0;
+            for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
+            {
+                var BrTeam1 = new BracketTeam
+                {
+                    BracketId = brackets[i].Id,
+                    TeamId = teams[j++].TeamId
+                };
+                var BrTeam2 = new BracketTeam
+                {
+                    BracketId = brackets[i].Id,
+                    TeamId = teams[j++].TeamId
+                };
+                await _context.BracketTeam.AddAsync(BrTeam1);
+                await _context.SaveChangesAsync();
+                await _context.BracketTeam.AddAsync(BrTeam2);
+                await _context.SaveChangesAsync();
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         // GET: Tournament/Create
@@ -145,6 +194,25 @@ namespace BracketzApp.Controllers
 
             var teams = _context.Team.Where(r => teamIds.Contains(r.TeamId)).ToList();
 
+            var brackets = _context.Bracket.Where(x => x.TournamentId.Equals(id));
+            var usefulBrackets = new Dictionary<int, UsefulBracket>();
+            foreach (var bracket in brackets)
+            {
+                var timIds = _context.BracketTeam.Where(x => x.BracketId == bracket.Id).ToList();
+                usefulBrackets.Add(bracket.Index, new UsefulBracket()
+                {
+                    Id = bracket.Id,
+                    Index = bracket.Index,
+                    IsFinished = bracket.IsFinished,
+                    ParentIndex = bracket.ParentId,
+                    ScoreTeam1 = bracket.ScoreTeam1,
+                    ScoreTeam2 = bracket.ScoreTeam2,
+                    TournamentId = bracket.TournamentId,
+                    Teams = timIds.Select(a => _context.Team.First(x => x.TeamId == a.TeamId)).ToArray(),
+                });
+            }
+
+            ViewBag.brackets = usefulBrackets;
             ViewBag.teams = teams;
             return View(tournament);
         }
