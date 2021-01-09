@@ -117,6 +117,21 @@ namespace BracketzApp.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Leave(int? id)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var myTeam = await _context.Team.FirstOrDefaultAsync(x => x.OwnerId == currentUser.Id);
+            if (myTeam != null)
+            {
+                var tournamentTeamEntry = new TournamentTeam();
+                tournamentTeamEntry.TournamentId = (int)id;
+                tournamentTeamEntry.TeamId = myTeam.TeamId;
+                var teamEntry = _context.TournamentTeam.Remove(tournamentTeamEntry);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
         public async Task<IActionResult> Inspect(int? id)
         {
             if (id == null)
