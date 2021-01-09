@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BracketzApp.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -231,11 +231,18 @@ namespace BracketzApp.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
+                    OwnerId = table.Column<string>(type: "TEXT", nullable: true),
                     TournamentId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Team", x => x.TeamId);
+                    table.ForeignKey(
+                        name: "FK_Team_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Team_Tournament_TournamentId",
                         column: x => x.TournamentId,
@@ -290,6 +297,54 @@ namespace BracketzApp.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Participant_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
+                        principalColumn: "TeamId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TournamentTeam",
+                columns: table => new
+                {
+                    TournamentId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeamId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TournamentTeam", x => new { x.TournamentId, x.TeamId });
+                    table.ForeignKey(
+                        name: "FK_TournamentTeam_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
+                        principalColumn: "TeamId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TournamentTeam_Tournament_TournamentId",
+                        column: x => x.TournamentId,
+                        principalTable: "Tournament",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ParticipantTeam",
+                columns: table => new
+                {
+                    ParticipantId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeamId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParticipantTeam", x => new { x.ParticipantId, x.TeamId });
+                    table.ForeignKey(
+                        name: "FK_ParticipantTeam_Participant_ParticipantId",
+                        column: x => x.ParticipantId,
+                        principalTable: "Participant",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ParticipantTeam_Team_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Team",
                         principalColumn: "TeamId",
@@ -359,6 +414,16 @@ namespace BracketzApp.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ParticipantTeam_TeamId",
+                table: "ParticipantTeam",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_OwnerId",
+                table: "Team",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Team_TournamentId",
                 table: "Team",
                 column: "TournamentId");
@@ -372,6 +437,11 @@ namespace BracketzApp.Migrations
                 name: "IX_Tournament_UserId",
                 table: "Tournament",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TournamentTeam_TeamId",
+                table: "TournamentTeam",
+                column: "TeamId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -395,13 +465,19 @@ namespace BracketzApp.Migrations
                 name: "BracketTeam");
 
             migrationBuilder.DropTable(
-                name: "Participant");
+                name: "ParticipantTeam");
+
+            migrationBuilder.DropTable(
+                name: "TournamentTeam");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Bracket");
+
+            migrationBuilder.DropTable(
+                name: "Participant");
 
             migrationBuilder.DropTable(
                 name: "Team");

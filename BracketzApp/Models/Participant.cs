@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,5 +25,6 @@ namespace BracketzApp.Models
         public int TeamId { get; set; }
         [ForeignKey("TeamId")]
         public Team Team { get; set; }
+        public virtual IEnumerable<ParticipantTeam> ParticipantTeam { get; set; }
     }
 }

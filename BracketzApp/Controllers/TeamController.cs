@@ -7,25 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace BracketzApp.Controllers
 {
     public class TeamController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private UserManager<IdentityUser> _userManager;
-        
-        public TeamController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
+
+        public TeamController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userMgr;
         }
 
         // GET: Team
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Team.ToListAsync());
+            var applicationDbContext = _context.Team.Include(t => t.IdentityUser);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Team/Details/5
@@ -37,6 +35,7 @@ namespace BracketzApp.Controllers
             }
 
             var team = await _context.Team
+                .Include(t => t.IdentityUser)
                 .FirstOrDefaultAsync(m => m.TeamId == id);
             if (team == null)
             {
@@ -49,6 +48,7 @@ namespace BracketzApp.Controllers
         // GET: Team/Create
         public IActionResult Create()
         {
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -57,17 +57,15 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TeamId,Name,Description")] Team team)
+        public async Task<IActionResult> Create([Bind("TeamId,Name,Description,OwnerId")] Team team)
         {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            team.OwnerId = currentUser.Id;
-            
             if (ModelState.IsValid)
             {
                 _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", team.OwnerId);
             return View(team);
         }
 
@@ -84,6 +82,7 @@ namespace BracketzApp.Controllers
             {
                 return NotFound();
             }
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", team.OwnerId);
             return View(team);
         }
 
@@ -92,7 +91,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TeamId,Name,Description")] Team team)
+        public async Task<IActionResult> Edit(int id, [Bind("TeamId,Name,Description,OwnerId")] Team team)
         {
             if (id != team.TeamId)
             {
@@ -119,6 +118,7 @@ namespace BracketzApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", team.OwnerId);
             return View(team);
         }
 
@@ -131,6 +131,7 @@ namespace BracketzApp.Controllers
             }
 
             var team = await _context.Team
+                .Include(t => t.IdentityUser)
                 .FirstOrDefaultAsync(m => m.TeamId == id);
             if (team == null)
             {

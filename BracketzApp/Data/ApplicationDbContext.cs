@@ -19,7 +19,9 @@ namespace BracketzApp.Data
         public DbSet<BracketTeam> BracketTeam { get; set; }
         public DbSet<TournamentFormat> TournamentFormat { get; set; }
         public DbSet<Tournament> Tournament { get; set; }
+        public DbSet<TournamentTeam> TournamentTeam { get; set; }
         public DbSet<Participant> Participant { get; set; }
+        public DbSet<ParticipantTeam> ParticipantTeam { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +37,30 @@ namespace BracketzApp.Data
             modelBuilder.Entity<BracketTeam>()
                         .HasOne(t => t.Team)
                         .WithMany(t => t.BracketTeam)
+                        .HasForeignKey(t => t.TeamId);
+
+            modelBuilder.Entity<ParticipantTeam>().HasKey(t => new { t.ParticipantId, t.TeamId });
+
+            modelBuilder.Entity<ParticipantTeam>()
+                        .HasOne(t => t.Team)
+                        .WithMany(t => t.ParticipantTeam)
+                        .HasForeignKey(t => t.TeamId);
+
+            modelBuilder.Entity<ParticipantTeam>()
+                        .HasOne(t => t.Participant)
+                        .WithMany(t => t.ParticipantTeam)
+                        .HasForeignKey(t => t.ParticipantId);
+
+            modelBuilder.Entity<TournamentTeam>().HasKey(t => new { t.TournamentId, t.TeamId });
+
+            modelBuilder.Entity<TournamentTeam>()
+                        .HasOne(t => t.Tournament)
+                        .WithMany(t => t.TournamentTeam)
+                        .HasForeignKey(t => t.TournamentId);
+
+            modelBuilder.Entity<TournamentTeam>()
+                        .HasOne(t => t.Team)
+                        .WithMany(t => t.TournamentTeam)
                         .HasForeignKey(t => t.TeamId);
         }
     }

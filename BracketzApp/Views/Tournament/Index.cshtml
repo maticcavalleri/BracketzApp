@@ -1,13 +1,13 @@
 @model IEnumerable<BracketzApp.Models.Tournament>
 
 @{
-    ViewData["Title"] = "Tournaments";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Tournaments</h1>
+<h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create new tournament</a>
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Game)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.User.UserName)
+                @Html.DisplayFor(modelItem => item.User.Id)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Date)
@@ -55,21 +55,9 @@
                 @Html.DisplayFor(modelItem => item.TournamentFormat.Name)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                @{  if (ViewBag.ownsTournament[item.Id]) 
-                    {
-                        <text> | </text>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
-                        <text> | </text>
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    }
-                }
-            </td>
-            <td>
-                <a asp-action="Join" asp-route-id="@item.Id">Join</a>
-            </td>
-            <td>
-                <a asp-action="Inspect" asp-route-id="@item.Id">Inspect</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

@@ -7,43 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Data.SqlClient;
-using Microsoft.Data.Sqlite;
-using System.Diagnostics;
 
 namespace BracketzApp.Controllers
 {
-    [Authorize]
     public class TournamentController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private UserManager<IdentityUser> _userManager;
 
-        public TournamentController(ApplicationDbContext context, UserManager<IdentityUser> userMgr)
+        public TournamentController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userMgr;
         }
 
         // GET: Tournament
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Tournament.Include(t => t.TournamentFormat).Include(t => t.User);
-            var tournamentList = await applicationDbContext.ToListAsync();
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            IDictionary<int, bool> ownsTournament = new Dictionary<int, bool>();
-            foreach (var tournament in tournamentList)
-            {
-                var isOwner = tournament.UserId == currentUser.Id ? true : false; 
-                ownsTournament.Add(tournament.Id, isOwner);
-            }
-
-            ViewBag.ownsTournament = ownsTournament;
-
-            return View(tournamentList);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Tournament/Details/5
@@ -63,17 +43,6 @@ namespace BracketzApp.Controllers
                 return NotFound();
             }
 
-            var teams = _context.Team
-                .Where(m => m.TournamentId == id)
-                .ToList();
-
-            ViewBag.teams = teams;
-
-            /* foreach (var team in teams)
-            {
-                Debug.WriteLine(team.Name);
-            } */
-
             return View(tournament);
         }
 
@@ -81,6 +50,7 @@ namespace BracketzApp.Controllers
         public IActionResult Create()
         {
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name");
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -91,9 +61,6 @@ namespace BracketzApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,NOfGames,Game,UserId,Date,TournamentFormatId")] Tournament tournament)
         {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            tournament.UserId = currentUser.Id;
-
             if (ModelState.IsValid)
             {
                 _context.Add(tournament);
@@ -101,43 +68,7 @@ namespace BracketzApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
-
-            return View();
-        }
-
-        public async Task<IActionResult> Join(int? id)
-        {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            var myTeam = await _context.Team.FirstOrDefaultAsync(x => x.OwnerId == currentUser.Id);
-            if (myTeam != null)
-            {
-                myTeam.TournamentId = id;
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
-        }
-        
-        public async Task<IActionResult> Inspect(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tournament = await _context.Tournament
-                .Include(t => t.TournamentFormat)
-                .Include(t => t.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (tournament == null)
-            {
-                return NotFound();
-            }
-
-            var teams = _context.Team
-                .Where(m => m.TournamentId == id)
-                .ToList();
-
-            ViewBag.teams = teams;
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", tournament.UserId);
             return View(tournament);
         }
 
@@ -150,14 +81,12 @@ namespace BracketzApp.Controllers
             }
 
             var tournament = await _context.Tournament.FindAsync(id);
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            if (tournament == null || tournament.User != currentUser)
+            if (tournament == null)
             {
                 return NotFound();
             }
-
             ViewData["TournamentFormatId"] = new SelectList(_context.TournamentFormat, "Id", "Name", tournament.TournamentFormatId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", tournament.UserId);
             return View(tournament);
         }
 
@@ -201,7 +130,6 @@ namespace BracketzApp.Controllers
         // GET: Tournament/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
             if (id == null)
             {
                 return NotFound();
@@ -211,8 +139,7 @@ namespace BracketzApp.Controllers
                 .Include(t => t.TournamentFormat)
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-                
-            if (tournament == null || tournament.User != currentUser)
+            if (tournament == null)
             {
                 return NotFound();
             }

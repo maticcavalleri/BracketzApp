@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BracketzApp.Models
 {
@@ -40,5 +40,7 @@ namespace BracketzApp.Models
         [DisplayName("Tournament Format")]
         [ForeignKey("TournamentFormatId")]
         public virtual TournamentFormat TournamentFormat { get; set; }
+
+        public virtual IEnumerable<TournamentTeam> TournamentTeam { get; set; }
     }
 }

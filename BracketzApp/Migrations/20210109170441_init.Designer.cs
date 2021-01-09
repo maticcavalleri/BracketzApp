@@ -3,14 +3,16 @@ using System;
 using BracketzApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BracketzApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210109170441_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,9 +104,14 @@ namespace BracketzApp.Migrations
                     b.Property<string>("OwnerId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("TournamentId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("TeamId");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("TournamentId");
 
                     b.ToTable("Team");
                 });
@@ -442,7 +449,13 @@ namespace BracketzApp.Migrations
                         .WithMany()
                         .HasForeignKey("OwnerId");
 
+                    b.HasOne("BracketzApp.Models.Tournament", "Tournament")
+                        .WithMany()
+                        .HasForeignKey("TournamentId");
+
                     b.Navigation("IdentityUser");
+
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("BracketzApp.Models.Tournament", b =>

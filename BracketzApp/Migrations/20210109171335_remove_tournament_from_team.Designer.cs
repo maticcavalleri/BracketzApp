@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BracketzApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201124183808_Init")]
-    partial class Init
+    [Migration("20210109171335_remove_tournament_from_team")]
+    partial class remove_tournament_from_team
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -101,12 +101,12 @@ namespace BracketzApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("TournamentId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("TeamId");
 
-                    b.HasIndex("TournamentId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Team");
                 });
@@ -357,6 +357,36 @@ namespace BracketzApp.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ParticipantTeam", b =>
+                {
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ParticipantId", "TeamId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("ParticipantTeam");
+                });
+
+            modelBuilder.Entity("TournamentTeam", b =>
+                {
+                    b.Property<int>("TournamentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TournamentId", "TeamId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("TournamentTeam");
+                });
+
             modelBuilder.Entity("BracketTeam", b =>
                 {
                     b.HasOne("BracketzApp.Models.Bracket", "Bracket")
@@ -410,11 +440,11 @@ namespace BracketzApp.Migrations
 
             modelBuilder.Entity("BracketzApp.Models.Team", b =>
                 {
-                    b.HasOne("BracketzApp.Models.Tournament", "Tournament")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
-                        .HasForeignKey("TournamentId");
+                        .HasForeignKey("OwnerId");
 
-                    b.Navigation("Tournament");
+                    b.Navigation("IdentityUser");
                 });
 
             modelBuilder.Entity("BracketzApp.Models.Tournament", b =>
@@ -485,14 +515,66 @@ namespace BracketzApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ParticipantTeam", b =>
+                {
+                    b.HasOne("BracketzApp.Models.Participant", "Participant")
+                        .WithMany("ParticipantTeam")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BracketzApp.Models.Team", "Team")
+                        .WithMany("ParticipantTeam")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("TournamentTeam", b =>
+                {
+                    b.HasOne("BracketzApp.Models.Team", "Team")
+                        .WithMany("TournamentTeam")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BracketzApp.Models.Tournament", "Tournament")
+                        .WithMany("TournamentTeam")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("Tournament");
+                });
+
             modelBuilder.Entity("BracketzApp.Models.Bracket", b =>
                 {
                     b.Navigation("BracketTeam");
                 });
 
+            modelBuilder.Entity("BracketzApp.Models.Participant", b =>
+                {
+                    b.Navigation("ParticipantTeam");
+                });
+
             modelBuilder.Entity("BracketzApp.Models.Team", b =>
                 {
                     b.Navigation("BracketTeam");
+
+                    b.Navigation("ParticipantTeam");
+
+                    b.Navigation("TournamentTeam");
+                });
+
+            modelBuilder.Entity("BracketzApp.Models.Tournament", b =>
+                {
+                    b.Navigation("TournamentTeam");
                 });
 #pragma warning restore 612, 618
         }
