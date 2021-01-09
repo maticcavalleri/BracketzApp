@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Net;
 
 namespace BracketzApp.Controllers
 {
     public class BracketController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<BracketController> _logger;
 
-        public BracketController(ApplicationDbContext context)
+        public BracketController(ApplicationDbContext context, ILogger<BracketController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Bracket
@@ -70,6 +75,54 @@ namespace BracketzApp.Controllers
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id", bracket.ParentId);
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game", bracket.TournamentId);
             return View(bracket);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Generate")]
+        public async Task<IActionResult> InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
+        {
+            var teams = _context.TournamentTeam
+                .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
+                .ToList();
+
+            var brackets = new Dictionary<int, Bracket>();
+            for (var i = teams.Count - 2; i >= 0; i--)
+            {
+                var parentId = (i == 0) ? -1 : (i - 1) / 2;
+                var bracket = new Bracket()
+                {
+                    Index = i,
+                    ParentId = parentId,
+                    TournamentId = bracketGenerateModel.TournamentId,
+                };
+                brackets.Add(i, bracket);
+                await _context.Bracket.AddAsync(bracket);
+                await _context.SaveChangesAsync();
+            }
+
+            // generateInitialBrackets
+            var j = 0;
+            for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
+            {
+                var BrTeam1 = new BracketTeam
+                {
+                    BracketId = brackets[i].Id,
+                    TeamId = teams[j++].TeamId
+                };
+                var BrTeam2 = new BracketTeam
+                {
+                    BracketId = brackets[i].Id,
+                    TeamId = teams[j++].TeamId
+                };
+                await _context.BracketTeam.AddAsync(BrTeam1);
+                await _context.SaveChangesAsync();
+                await _context.BracketTeam.AddAsync(BrTeam2);
+                await _context.SaveChangesAsync();
+            }
+
+            var test = await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // GET: Bracket/Edit/5

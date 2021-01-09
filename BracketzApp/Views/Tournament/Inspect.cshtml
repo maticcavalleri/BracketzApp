@@ -14,7 +14,11 @@
         <a href="@Url.Action("Details", "Team", new RouteValueDictionary{ {"id", @team.TeamId} } )">@team.Name</a>
     </div>
 }
-<button>Start tournament</button>
+
+<form asp-controller="Bracket" asp-action="Generate" method="POST">
+    <input type="hidden" name="TournamentId" value="@this.Model.Id"/>
+    <input type="submit" value="Generate brackets" />
+</form>
 <canvas id="canvas" width="1200" height="800">
     
 </canvas>  
