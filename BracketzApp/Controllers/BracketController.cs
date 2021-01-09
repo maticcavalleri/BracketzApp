@@ -59,7 +59,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ScoreTeam1,ScoreTeam2,Index,TournamentId,ParentId")] Bracket bracket)
+        public async Task<IActionResult> Create([Bind("Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
         {
             if (ModelState.IsValid)
             {
@@ -95,7 +95,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreTeam1,ScoreTeam2,Index,TournamentId,ParentId")] Bracket bracket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
         {
             if (id != bracket.Id)
             {

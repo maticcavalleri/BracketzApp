@@ -22,6 +22,9 @@
                 @Html.DisplayNameFor(model => model.Index)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.IsFinished)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Tournament)
             </th>
             <th>
@@ -41,6 +44,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Index)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsFinished)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Tournament.Game)
