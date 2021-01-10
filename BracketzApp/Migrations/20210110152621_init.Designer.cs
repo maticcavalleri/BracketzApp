@@ -9,29 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BracketzApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210109190140_remove_team_from_participant")]
-    partial class remove_team_from_participant
+    [Migration("20210110152621_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.0");
-
-            modelBuilder.Entity("BracketTeam", b =>
-                {
-                    b.Property<int>("BracketId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BracketId", "TeamId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("BracketTeam");
-                });
 
             modelBuilder.Entity("BracketzApp.Models.Bracket", b =>
                 {
@@ -54,12 +39,22 @@ namespace BracketzApp.Migrations
                     b.Property<int>("ScoreTeam2")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("Team1Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Team2Id")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("TournamentId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("Team1Id");
+
+                    b.HasIndex("Team2Id");
 
                     b.HasIndex("TournamentId");
 
@@ -388,36 +383,29 @@ namespace BracketzApp.Migrations
                     b.ToTable("TournamentTeam");
                 });
 
-            modelBuilder.Entity("BracketTeam", b =>
-                {
-                    b.HasOne("BracketzApp.Models.Bracket", "Bracket")
-                        .WithMany("BracketTeam")
-                        .HasForeignKey("BracketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BracketzApp.Models.Team", "Team")
-                        .WithMany("BracketTeam")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bracket");
-
-                    b.Navigation("Team");
-                });
-
             modelBuilder.Entity("BracketzApp.Models.Bracket", b =>
                 {
                     b.HasOne("BracketzApp.Models.Bracket", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId");
 
+                    b.HasOne("BracketzApp.Models.Team", "Team1")
+                        .WithMany()
+                        .HasForeignKey("Team1Id");
+
+                    b.HasOne("BracketzApp.Models.Team", "Team2")
+                        .WithMany()
+                        .HasForeignKey("Team2Id");
+
                     b.HasOne("BracketzApp.Models.Tournament", "Tournament")
                         .WithMany()
                         .HasForeignKey("TournamentId");
 
                     b.Navigation("Parent");
+
+                    b.Navigation("Team1");
+
+                    b.Navigation("Team2");
 
                     b.Navigation("Tournament");
                 });
@@ -546,11 +534,6 @@ namespace BracketzApp.Migrations
                     b.Navigation("Tournament");
                 });
 
-            modelBuilder.Entity("BracketzApp.Models.Bracket", b =>
-                {
-                    b.Navigation("BracketTeam");
-                });
-
             modelBuilder.Entity("BracketzApp.Models.Participant", b =>
                 {
                     b.Navigation("ParticipantTeam");
@@ -558,8 +541,6 @@ namespace BracketzApp.Migrations
 
             modelBuilder.Entity("BracketzApp.Models.Team", b =>
                 {
-                    b.Navigation("BracketTeam");
-
                     b.Navigation("ParticipantTeam");
 
                     b.Navigation("TournamentTeam");
