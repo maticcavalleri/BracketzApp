@@ -14,7 +14,8 @@ namespace BracketzApp.CustomClasses
         
         public bool IsFinished { get; set; }
 
-        public Team[]? Teams { get; set; }
+        public Team Team1 { get; set; }
+        public Team Team2 { get; set; }
 
         public int? TournamentId { get; set; }
 

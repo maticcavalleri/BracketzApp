@@ -202,7 +202,6 @@ namespace BracketzApp.Controllers
             var usefulBrackets = new Dictionary<int, UsefulBracket>();
             foreach (var bracket in brackets)
             {
-                var timIds = _context.BracketTeam.Where(x => x.BracketId == bracket.Id).ToList();
                 usefulBrackets.Add(bracket.Index, new UsefulBracket()
                 {
                     Id = bracket.Id,
@@ -212,7 +211,8 @@ namespace BracketzApp.Controllers
                     ScoreTeam1 = bracket.ScoreTeam1,
                     ScoreTeam2 = bracket.ScoreTeam2,
                     TournamentId = bracket.TournamentId,
-                    Teams = timIds.Select(a => _context.Team.First(x => x.TeamId == a.TeamId)).ToArray(),
+                    Team1 = bracket.Team1,
+                    Team2 = bracket.Team2,
                 });
             }
 
