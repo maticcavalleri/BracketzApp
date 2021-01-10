@@ -60,14 +60,11 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
             <td>
-                @*<a asp-action="Join" asp-route-id="@item.Id">Join</a>*@
-
-                <form asp-controller="Tournament" asp-action="Join">
-                    <label name="TeamId" class="control-label"></label>
-                    <select name="TeamId" class="form-control" asp-items="ViewBag.TeamId"></select>
+                <form id="joinTournamentForm" asp-controller="Tournament" asp-action="Join" style="display: inline-block;">
+                    <select name="TeamId" class="form-control" asp-items="ViewBag.TeamId" style="height: 40px;"></select>
                     <input type="hidden" name="TournamentId" value="@item.Id" />
-                    <input type="submit" value="Join"/>
                 </form>
+                <a id="joinTournamentButton" href="#">Join</a>
             </td>
             <td>
                 <a asp-action="Inspect" asp-route-id="@item.Id">Inspect</a>
@@ -76,3 +73,11 @@
 }
     </tbody>
 </table>
+
+<script>
+    var form = document.getElementById("joinTournamentForm");
+
+    document.getElementById("joinTournamentButton").addEventListener("click", function () {
+        form.submit();
+    });
+</script>
