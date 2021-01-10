@@ -79,3 +79,25 @@ body {
     background-color: grey;
     border-color: black;
 }
+
+#drawContainer {
+    height: 800px;
+    position: relative;
+    width: 1200px;
+}
+
+#drawCanvas {
+    height: 100%;
+    width: 100%;
+}
+
+#controls {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.canvasButton {
+    padding: 0;
+}

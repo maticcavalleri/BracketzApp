@@ -26,10 +26,17 @@
         <p id="nOfTeamsMessage" style="visibility: hidden">Number of teams must be power of 2 to generate brackets.</p>
     </div>
 </div>
-<canvas id="drawCanvas" width="1500" height="800">
-</canvas>
+
+<div id="drawContainer">
+    <canvas id="drawCanvas" width="1200" height="800">
+    </canvas>
+    <menu id="controls">
+    </menu>
+</div>
 
 <script>
+
+let ctrls = document.getElementById("controls");
 
 function powerOfTwo(x) {
     return ((x != 0) && !(x & (x - 1)));
@@ -125,8 +132,42 @@ function drawChildren(index, round, y) {
     ctx.fillText(brackets[index]["Team2"]["Name"] || '/', (round-1) * xOffset+10, y+15);
     ctx.fillText(brackets[index]["ScoreTeam2"], (round-1) * xOffset+10 + 200, y+15);
     ctx.beginPath();
-    ctx.rect((round-1) * xOffset + 5, y - 20, 220, 45);
+    ctx.rect((round - 1) * xOffset + 5, y - 20, 220, 45);
     ctx.stroke();
+    var addTeam1 = document.createElement('button');
+    ctrls.appendChild(addTeam1);
+    addTeam1.classList.add("canvasButton");
+    addTeam1.style.position = "absolute";
+    addTeam1.classList.add("btn");
+    addTeam1.classList.add("btn-primary");
+    addTeam1.style.zIndex = 2;
+    addTeam1.style.left = (round - 1) * xOffset + 225 + "px";
+    addTeam1.style.height = 24 + "px";
+    addTeam1.style.top = (y - 20 + 2) * -1 + "px";
+    addTeam1.style.width = 24 + "px";
+    addTeam1.innerText = "+";
+
+    var addTeam2 = document.createElement('button');
+    ctrls.appendChild(addTeam2);
+    addTeam2.classList.add("canvasButton");
+    addTeam2.classList.add("btn");
+    addTeam2.classList.add("btn-primary");
+    addTeam2.style.position = "absolute";
+    addTeam2.style.zIndex = 2;
+    addTeam2.style.left = (round - 1) * xOffset + 225 + "px";
+    addTeam2.style.height = 24 + "px";
+    addTeam2.style.top = (y - 20 + 25) * -1 + "px";
+    addTeam2.style.width = 24 + "px";
+    addTeam2.innerText = "+";
+
+    @*var finishBtn = document.createElement('button');
+    ctrls.appendChild(finishBtn);
+    finishBtn.style.position = "absolute";
+    finishBtn.style.zIndex = 2;
+    finishBtn.style.left = (round - 1) * xOffset + 225 + "px";
+    finishBtn.style.height = 23 + "px";
+    finishBtn.style.top = (y - 20) * -1 + "px";
+    finishBtn.innerText = "Complete";*@
 
     if (!(round === Math.log10(brackets.length + 1) / Math.log10(2))) {
         ctx.beginPath();
