@@ -42,8 +42,28 @@ namespace BracketzApp.Controllers
                 var isOwner = tournament.UserId == currentUser.Id ? true : false;
                 ownsTournament.Add(tournament.Id, isOwner);
             }
+            var myTeam = await _context.Team.FirstOrDefaultAsync(x => x.OwnerId == currentUser.Id);
 
             ViewBag.ownsTournament = ownsTournament;
+
+            var userTeamsInTournament = _context.TournamentTeam.Where(m => m.Team.OwnerId == currentUser.Id).ToList();
+            var userTeamIdsInTournament = new List<int>();
+            foreach (TournamentTeam tTeam in userTeamsInTournament)
+            {
+                userTeamIdsInTournament.Add(tTeam.TeamId);
+            }
+
+            var userTeams = _context.Team.Where(m => m.OwnerId == currentUser.Id).ToList();
+            var filteredUserTeamIds = new List<int>();
+            foreach(Team team in userTeams)
+            {
+                if (!userTeamIdsInTournament.Contains(team.TeamId)) {
+                    filteredUserTeamIds.Add(team.TeamId);
+                }
+            }
+            var selectTeamList = _context.Team.Where(m => filteredUserTeamIds.Contains(m.TeamId)).ToList();
+
+            ViewData["TeamId"] = new SelectList(selectTeamList, "TeamId", "Name", myTeam.TeamId);
 
             return View(tournamentList);
         }
@@ -140,18 +160,17 @@ namespace BracketzApp.Controllers
             return View(tournament);
         }
 
-        public async Task<IActionResult> Join(int? id)
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Join([FromForm] JoinTournamentModel joinTournamentModel)
         {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            var myTeam = await _context.Team.FirstOrDefaultAsync(x => x.OwnerId == currentUser.Id);
-            if (myTeam != null)
+            var tournamentTeamEntry = new TournamentTeam
             {
-                var tournamentTeamEntry = new TournamentTeam();
-                tournamentTeamEntry.TournamentId = (int)id;
-                tournamentTeamEntry.TeamId = myTeam.TeamId;
-                var teamEntry = await _context.TournamentTeam.AddAsync(tournamentTeamEntry);
-                _context.SaveChanges();
-            }
+                TournamentId = joinTournamentModel.TournamentId,
+                TeamId = joinTournamentModel.TeamId
+            };
+            await _context.TournamentTeam.AddAsync(tournamentTeamEntry);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
