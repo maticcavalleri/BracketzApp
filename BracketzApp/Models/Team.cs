@@ -15,11 +15,11 @@ namespace BracketzApp.Models
         public string Name { get; set; }
 
         public string Description { get; set; }
-        
+
+        [DisplayName("Team owner")]
         public string OwnerId { get; set; }
         
         [ForeignKey("OwnerId")]
-        [DisplayName("Team owner")]
         public virtual IdentityUser IdentityUser { get; set; }
         
         //public virtual IEnumerable<BracketTeam> BracketTeam { get; set; }
