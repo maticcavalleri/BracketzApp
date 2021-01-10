@@ -35,6 +35,7 @@
 </div>
 
 <script>
+let baseUrl = "https://localhost:5001/Bracket/";
 
 let ctrls = document.getElementById("controls");
 
@@ -148,6 +149,26 @@ function drawChildren(index, round, y) {
     addTeam1.style.width = 24 + "px";
     addTeam1.innerText = "+";
 
+    addTeam1.addEventListener('click', event => {
+        var t = $("input[name='__RequestVerificationToken']").val();
+        $.ajax({
+            url: baseUrl + "UpdateScore",
+            type: 'Post',
+            headers:
+            {
+                "RequestVerificationToken": t
+            },
+            data: {
+                BracketId: brackets[index]["Id"],
+                ScoreTeam1: brackets[index]["ScoreTeam1"] + 1,
+                ScoreTeam2: brackets[index]["ScoreTeam2"]
+            },
+            success: function (msg) {
+                brackets[index]["ScoreTeam1"]++;
+            }
+        });
+    });
+
     var addTeam2 = document.createElement('button');
     ctrls.appendChild(addTeam2);
     addTeam2.classList.add("canvasButton");
@@ -161,6 +182,25 @@ function drawChildren(index, round, y) {
     addTeam2.style.width = 24 + "px";
     addTeam2.innerText = "+";
 
+    addTeam2.addEventListener('click', event => {
+        var t = $("input[name='__RequestVerificationToken']").val();
+        $.ajax({
+            url: baseUrl + "UpdateScore",
+            type: 'Post',
+            headers:
+            {
+                "RequestVerificationToken": t
+            },
+            data: {
+                BracketId: brackets[index]["Id"],
+                ScoreTeam1: brackets[index]["ScoreTeam1"],
+                ScoreTeam2: brackets[index]["ScoreTeam2"] + 1
+            },
+            success: function (msg) {
+                brackets[index]["ScoreTeam2"]++;
+            }
+        });
+    });
 
     @*var finishBtn = document.createElement('button');
     ctrls.appendChild(finishBtn);
