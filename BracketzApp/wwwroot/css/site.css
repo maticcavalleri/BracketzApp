@@ -106,4 +106,6 @@ body {
 
 .canvasButton {
     padding: 0;
+    line-height: 24px;
+    border: 0;
 }

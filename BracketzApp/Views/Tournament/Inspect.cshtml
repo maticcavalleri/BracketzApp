@@ -135,8 +135,9 @@ function drawChildren(index, round, y) {
     ctx.fillText(brackets[index]["Team2"]["Name"] || '/', (round-1) * xOffset+10, y+15);
     ctx.fillText(brackets[index]["ScoreTeam2"], (round-1) * xOffset+10 + 200, y+15);
     ctx.beginPath();
-    ctx.rect((round-1) * xOffset + 5, y - 20, 220, 45);
+    ctx.rect((round - 1) * xOffset + 5, y - 20, 220, 45);
     ctx.stroke();
+
     var addTeam1 = document.createElement('button');
     ctrls.appendChild(addTeam1);
     addTeam1.classList.add("canvasButton");
@@ -181,13 +182,13 @@ function drawChildren(index, round, y) {
         ctx.moveTo((round-1) * xOffset + 230, y);
         ctx.lineTo((round-1) * xOffset + 410, y);
         ctx.stroke();
-        
+
         ctx.beginPath();
         ctx.moveTo((round-1) * xOffset + 410, (y - drawHeight / Math.pow(round + 1, 2)) + 30);
         ctx.lineTo((round-1) * xOffset + 410, (y + drawHeight / Math.pow(round + 1, 2)) - 30);
         ctx.stroke();
     }
-    
+
     drawChildren(index * 2 + 1, round + 1, y - drawHeight / Math.pow(round + 1, 2));
     drawChildren(index * 2 + 2, round + 1, y + drawHeight / Math.pow(round + 1, 2));
 }
