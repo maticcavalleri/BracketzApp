@@ -78,7 +78,7 @@ namespace BracketzApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Generate")]
-        public async Task InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
+        public async Task<IActionResult> InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
         {
             var teams = _context.TournamentTeam
                 .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
@@ -103,23 +103,35 @@ namespace BracketzApp.Controllers
             var j = 0;
             for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
             {
-                var BrTeam1 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                var BrTeam2 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                await _context.BracketTeam.AddAsync(BrTeam1);
-                await _context.SaveChangesAsync();
-                await _context.BracketTeam.AddAsync(BrTeam2);
-                await _context.SaveChangesAsync();
+                brackets[i].Team1Id = teams[j++].TeamId;
+                brackets[i].Team2Id = teams[j++].TeamId;
             }
 
             await _context.SaveChangesAsync();
+            
+            // put usefulBrackets into ViewBag as soon as brackets are created
+            
+            var brckts = _context.Bracket.Where(x => x.TournamentId.Equals(bracketGenerateModel.TournamentId));
+            var usefulBrackets = new Dictionary<int, UsefulBracket>();
+            foreach (var bracket in brckts)
+            {
+                usefulBrackets.Add(bracket.Index, new UsefulBracket()
+                {
+                    Id = bracket.Id,
+                    Index = bracket.Index,
+                    IsFinished = bracket.IsFinished,
+                    ParentIndex = bracket.ParentId,
+                    ScoreTeam1 = bracket.ScoreTeam1,
+                    ScoreTeam2 = bracket.ScoreTeam2,
+                    TournamentId = bracket.TournamentId,
+                    Team1 = bracket.Team1,
+                    Team2 = bracket.Team2,
+                });
+            }
+
+            ViewBag.brackets = usefulBrackets;
+            
+            return Ok();
         }
 
         // GET: Tournament/Create
@@ -213,7 +225,6 @@ namespace BracketzApp.Controllers
             var usefulBrackets = new Dictionary<int, UsefulBracket>();
             foreach (var bracket in brackets)
             {
-                var timIds = _context.BracketTeam.Where(x => x.BracketId == bracket.Id).ToList();
                 usefulBrackets.Add(bracket.Index, new UsefulBracket()
                 {
                     Id = bracket.Id,
@@ -223,7 +234,8 @@ namespace BracketzApp.Controllers
                     ScoreTeam1 = bracket.ScoreTeam1,
                     ScoreTeam2 = bracket.ScoreTeam2,
                     TournamentId = bracket.TournamentId,
-                    Teams = timIds.Select(a => _context.Team.First(x => x.TeamId == a.TeamId)).ToArray(),
+                    Team1 = bracket.Team1,
+                    Team2 = bracket.Team2,
                 });
             }
 

@@ -13,6 +13,12 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Team1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Team2)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.ScoreTeam1)
             </th>
             <th>
@@ -36,6 +42,12 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Team1.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Team2.Name)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ScoreTeam1)
             </td>

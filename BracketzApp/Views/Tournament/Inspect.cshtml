@@ -20,11 +20,107 @@
     <input type="hidden" name="TournamentId" value="@this.Model.Id"/>
     <input type="submit" value="Generate brackets" />
 </form>
-<canvas id="canvas" width="1200" height="800">
+<canvas id="drawCanvas" width="1500" height="800">
     
 </canvas>  
 
 <script>
-let x = @ViewBag.brackets;
+
+// parse data from C# to JS object
+let temp_brackets = [];
+let bracket;
+let team1;
+let team2;
+let no = false
+let yes = true
+let i = 0;
+@foreach (var bracket in ViewBag.brackets)
+{
+    @: bracket = {};
+    @: team1 = {};
+    @: team2 = {};
+    @: bracket["Id"] = @bracket.Value.Id;
+    @: bracket["ScoreTeam1"] = @bracket.Value.ScoreTeam1;
+    @: bracket["ScoreTeam2"] = @bracket.Value.ScoreTeam2;
+    @: bracket["Index"] = @bracket.Value.Index;
+    if (bracket.Value.IsFinished == false)
+    {
+        @: bracket["IsFinished"] = no
+    }
+    else
+    {
+        @: bracket["IsFinished"] = yes
+    }
+    if (bracket.Value.Team1 != null)
+    {
+        @: team1["TeamId"] = @bracket.Value.Team1?.TeamId;
+        @: team1["Name"] = '@bracket.Value.Team1?.Name';
+    }
+    else
+    {
+        @: team1["TeamId"] = null;
+        @: team1["Name"] = null;
+    }
+    @: bracket["Team1"] = team1;
+    if (bracket.Value.Team2 != null)
+    {
+        @: team2["TeamId"] = @bracket.Value.Team2?.TeamId;
+        @: team2["Name"] = '@bracket.Value.Team2?.Name';
+    }
+    else
+    {
+        @: team2["TeamId"] = null;
+        @: team2["Name"] = null;
+    }
+    @: bracket["Team2"] = team2;
+    @: bracket["TournamentId"] = @bracket.Value.TournamentId;
+    @: bracket["ParentIndex"] = @bracket.Value.ParentIndex;
+    @: temp_brackets.push(bracket);
+    @: i++;
+}
+
+// rearrange objects in array so they have proper indexes
+let brackets = []
+for (let i = 0; i < temp_brackets.length; i++) {
+    let realIndex = temp_brackets[i]["Index"];
+    brackets[realIndex] = temp_brackets[i];
+}
+console.log(brackets);
+
+let round = 1;
+let drawHeight = 800; // --- hardcoded - should be same as canvas height
+
+let canvas = document.getElementById("drawCanvas");
+let ctx = canvas.getContext("2d");
+ctx.font = "15px Arial";
+
+drawChildren(0, 1, 800 / 2);
+
+function drawChildren(index, round, y) {
+    if (round > Math.log10(brackets.length + 1) / Math.log10(2)) return;
+    let xOffset = 400;
+    ctx.fillText(brackets[index]["Team1"]["Name"] || '/', (round-1) * xOffset+10, y);
+    ctx.fillText(brackets[index]["ScoreTeam1"], (round-1) * xOffset+10 + 200, y);
+    ctx.fillText(brackets[index]["Team2"]["Name"] || '/', (round-1) * xOffset+10, y+15);
+    ctx.fillText(brackets[index]["ScoreTeam2"], (round-1) * xOffset+10 + 200, y+15);
+    ctx.beginPath();
+    ctx.rect((round-1) * xOffset + 5, y - 20, 220, 45);
+    ctx.stroke();
+    
+    if (!(round === Math.log10(brackets.length + 1) / Math.log10(2))) {
+        ctx.beginPath();
+        ctx.moveTo((round-1) * xOffset + 230, y);
+        ctx.lineTo((round-1) * xOffset + 410, y);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo((round-1) * xOffset + 410, (y - drawHeight / Math.pow(round + 1, 2)) + 30);
+        ctx.lineTo((round-1) * xOffset + 410, (y + drawHeight / Math.pow(round + 1, 2)) - 30);
+        ctx.stroke();
+    }
+    
+    drawChildren(index * 2 + 1, round + 1, y - drawHeight / Math.pow(round + 1, 2));
+    drawChildren(index * 2 + 2, round + 1, y + drawHeight / Math.pow(round + 1, 2));
+}
 
 </script>
