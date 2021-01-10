@@ -71,19 +71,19 @@ namespace BracketzApp.Controllers
             
             ViewBag.teams = teams;
             ViewBag.tournament = tournament;
-
-            // when you click details tournament starts and initial brackets are made
-            await InitialBrackets(id);
             
             return View(tournament);
         }
 
-        public async Task InitialBrackets(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Generate")]
+        public async Task<IActionResult> InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
         {
             var teams = _context.TournamentTeam
-                .Where(m => m.TournamentId == id)
+                .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
                 .ToList();
-            
+
             var brackets = new Dictionary<int, Bracket>();
             for (var i = teams.Count - 2; i >= 0; i--)
             {
@@ -92,34 +92,23 @@ namespace BracketzApp.Controllers
                 {
                     Index = i,
                     ParentId = parentId,
-                    TournamentId = id,
+                    TournamentId = bracketGenerateModel.TournamentId,
                 };
                 brackets.Add(i, bracket);
                 await _context.Bracket.AddAsync(bracket);
                 await _context.SaveChangesAsync();
             }
-            
+
             // generateInitialBrackets
             var j = 0;
             for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
             {
-                var BrTeam1 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                var BrTeam2 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                await _context.BracketTeam.AddAsync(BrTeam1);
-                await _context.SaveChangesAsync();
-                await _context.BracketTeam.AddAsync(BrTeam2);
-                await _context.SaveChangesAsync();
+                brackets[i].Team1Id = teams[j++].TeamId;
+                brackets[i].Team2Id = teams[j++].TeamId;
             }
 
             await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // GET: Tournament/Create

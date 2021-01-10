@@ -16,7 +16,7 @@
     </div>
 }
 
-<form asp-controller="Bracket" asp-action="Generate" method="POST">
+<form asp-controller="Tournament" asp-action="Generate" method="POST">
     <input type="hidden" name="TournamentId" value="@this.Model.Id"/>
     <input type="submit" value="Generate brackets" />
 </form>
