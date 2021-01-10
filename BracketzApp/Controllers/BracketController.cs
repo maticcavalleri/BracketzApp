@@ -105,23 +105,11 @@ namespace BracketzApp.Controllers
             var j = 0;
             for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
             {
-                var BrTeam1 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                var BrTeam2 = new BracketTeam
-                {
-                    BracketId = brackets[i].Id,
-                    TeamId = teams[j++].TeamId
-                };
-                await _context.BracketTeam.AddAsync(BrTeam1);
-                await _context.SaveChangesAsync();
-                await _context.BracketTeam.AddAsync(BrTeam2);
-                await _context.SaveChangesAsync();
+                brackets[i].Team1Id = teams[j++].TeamId;
+                brackets[i].Team2Id = teams[j++].TeamId;
             }
 
-            var test = await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok();
         }
 

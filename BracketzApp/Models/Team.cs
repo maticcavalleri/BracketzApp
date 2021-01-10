@@ -22,7 +22,7 @@ namespace BracketzApp.Models
         [DisplayName("Team owner")]
         public virtual IdentityUser IdentityUser { get; set; }
         
-        public virtual IEnumerable<BracketTeam> BracketTeam { get; set; }
+        //public virtual IEnumerable<BracketTeam> BracketTeam { get; set; }
         public virtual IEnumerable<ParticipantTeam> ParticipantTeam { get; set; }
         public virtual IEnumerable<TournamentTeam> TournamentTeam { get; set; }
     }
