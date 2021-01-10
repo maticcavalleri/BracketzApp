@@ -72,18 +72,18 @@ namespace BracketzApp.Controllers
             ViewBag.teams = teams;
             ViewBag.tournament = tournament;
 
-            // when you click details tournament starts and initial brackets are made
-            await InitialBrackets(id);
-            
             return View(tournament);
         }
 
-        public async Task InitialBrackets(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Generate")]
+        public async Task InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
         {
             var teams = _context.TournamentTeam
-                .Where(m => m.TournamentId == id)
+                .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
                 .ToList();
-            
+
             var brackets = new Dictionary<int, Bracket>();
             for (var i = teams.Count - 2; i >= 0; i--)
             {
@@ -92,13 +92,13 @@ namespace BracketzApp.Controllers
                 {
                     Index = i,
                     ParentId = parentId,
-                    TournamentId = id,
+                    TournamentId = bracketGenerateModel.TournamentId,
                 };
                 brackets.Add(i, bracket);
                 await _context.Bracket.AddAsync(bracket);
                 await _context.SaveChangesAsync();
             }
-            
+
             // generateInitialBrackets
             var j = 0;
             for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
