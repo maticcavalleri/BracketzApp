@@ -117,13 +117,13 @@ for (let i = 0; i < temp_brackets.length; i++) {
 }
 console.log(brackets);
 
-let round = 1;
-let drawHeight = canvas.height;
-let drawWidth = canvas.width;
-
 let canvas = document.getElementById("drawCanvas");
 let ctx = canvas.getContext("2d");
 ctx.font = "15px Arial";
+
+let round = 1;
+let drawHeight = canvas.height;
+let drawWidth = canvas.width;
 
 drawChildren(0, 1, drawHeight / 2);
 
@@ -163,14 +163,18 @@ function drawChildren(index, round, y) {
     addTeam2.style.width = 24 + "px";
     addTeam2.innerText = "+";
 
-    @*var finishBtn = document.createElement('button');
-    ctrls.appendChild(finishBtn);
-    finishBtn.style.position = "absolute";
-    finishBtn.style.zIndex = 2;
-    finishBtn.style.left = (round - 1) * xOffset + 225 + "px";
-    finishBtn.style.height = 23 + "px";
-    finishBtn.style.top = (y - 20) * -1 + "px";
-    finishBtn.innerText = "Complete";*@
+    let finish = document.createElement('button');
+    ctrls.appendChild(finish);
+    finish.classList.add("canvasButton");
+    finish.classList.add("btn");
+    finish.classList.add("btn-finish");
+    finish.style.position = "absolute";
+    finish.style.zIndex = 2;
+    finish.style.left = (round - 1) * xOffset - 23 + "px";
+    finish.style.height = 47 + "px";
+    finish.style.top = (y + 5) * -1 + "px";
+    finish.style.width = 24 + "px";
+    finish.innerText = "<";
 
     if (!(round === Math.log10(brackets.length + 1) / Math.log10(2))) {
         ctx.beginPath();
