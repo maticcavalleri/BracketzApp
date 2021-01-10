@@ -77,6 +77,42 @@ namespace BracketzApp.Controllers
             return View(bracket);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Generate")]
+        public async Task<IActionResult> InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
+        {
+            var teams = _context.TournamentTeam
+                .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
+                .ToList();
+
+            var brackets = new Dictionary<int, Bracket>();
+            for (var i = teams.Count - 2; i >= 0; i--)
+            {
+                var parentId = (i == 0) ? -1 : (i - 1) / 2;
+                var bracket = new Bracket()
+                {
+                    Index = i,
+                    ParentId = parentId,
+                    TournamentId = bracketGenerateModel.TournamentId,
+                };
+                brackets.Add(i, bracket);
+                await _context.Bracket.AddAsync(bracket);
+                await _context.SaveChangesAsync();
+            }
+
+            // generateInitialBrackets
+            var j = 0;
+            for (var i = teams.Count - 2; i >= (teams.Count - 2) / 2; i--)
+            {
+                brackets[i].Team1Id = teams[j++].TeamId;
+                brackets[i].Team2Id = teams[j++].TeamId;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         // GET: Bracket/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

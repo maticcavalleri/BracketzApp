@@ -16,7 +16,7 @@ namespace BracketzApp.Data
         }
         public DbSet<Team> Team { get; set; }
         public DbSet<Bracket> Bracket { get; set; }
-        public DbSet<BracketTeam> BracketTeam { get; set; }
+        //public DbSet<BracketTeam> BracketTeam { get; set; }
         public DbSet<TournamentFormat> TournamentFormat { get; set; }
         public DbSet<Tournament> Tournament { get; set; }
         public DbSet<TournamentTeam> TournamentTeam { get; set; }
@@ -27,7 +27,7 @@ namespace BracketzApp.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            modelBuilder.Entity<BracketTeam>().HasKey(t => new { t.BracketId, t.TeamId });
+            /*modelBuilder.Entity<BracketTeam>().HasKey(t => new { t.BracketId, t.TeamId });
 
             modelBuilder.Entity<BracketTeam>()
                         .HasOne(t => t.Bracket)
@@ -37,7 +37,7 @@ namespace BracketzApp.Data
             modelBuilder.Entity<BracketTeam>()
                         .HasOne(t => t.Team)
                         .WithMany(t => t.BracketTeam)
-                        .HasForeignKey(t => t.TeamId);
+                        .HasForeignKey(t => t.TeamId);*/
 
             modelBuilder.Entity<ParticipantTeam>().HasKey(t => new { t.ParticipantId, t.TeamId });
 
