@@ -9,75 +9,39 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NOfGames)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Game)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TournamentFormat)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NOfGames)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Game)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TournamentFormat.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-            <td>
-                <form id="joinTournamentForm" asp-controller="Tournament" asp-action="Join" style="display: inline-block;">
-                    <select name="TeamId" class="form-control" asp-items="ViewBag.TeamId" style="height: 40px;"></select>
-                    <input type="hidden" name="TournamentId" value="@item.Id" />
-                </form>
-                <a id="joinTournamentButton" href="#">Join</a>
-            </td>
-            <td>
-                <a asp-action="Inspect" asp-route-id="@item.Id">Inspect</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-
-<script>
-    var form = document.getElementById("joinTournamentForm");
-
-    document.getElementById("joinTournamentButton").addEventListener("click", function () {
-        form.submit();
-    });
-</script>
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@item.Game</h6>
+                        <span class="badge badge-pill badge-primary">@item.TournamentFormat.Name</span>
+                        <span class="badge badge-pill badge-info">Best of @item.NOfGames</span>
+                        <p>Date: @item.Date</p>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 11px;" class="card-text">Created by @item.User.UserName</p>
+                        <form id="@item.Id" class="joinTournamentForm" asp-controller="Tournament" asp-action="Join" style="display: inline-block;">
+                            <select name="TeamId" class="form-control" asp-items="@ViewBag.ApplicableTeams[item.Id]" style="height: 40px;"></select>
+                            <input type="hidden" name="TournamentId" value="@item.Id" />
+                        </form>
+                        <a onclick="document.getElementById('@item.Id').submit();" href="#" class="card-link joinTournamentButton">Join</a>
+                        <a asp-action="Inspect" asp-route-id="@item.Id" class="card-link">Brackets</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

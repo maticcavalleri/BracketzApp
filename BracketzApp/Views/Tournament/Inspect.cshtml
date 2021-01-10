@@ -18,7 +18,7 @@
 
 <form asp-controller="Tournament" asp-action="Generate" method="POST">
     <input type="hidden" name="TournamentId" value="@this.Model.Id"/>
-    <input type="submit" value="Generate brackets" />
+    <input class="btn btn-primary" type="submit" value="Generate brackets" />
 </form>
 <canvas id="canvas" width="1200" height="800">
     

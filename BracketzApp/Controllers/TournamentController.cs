@@ -46,24 +46,33 @@ namespace BracketzApp.Controllers
 
             ViewBag.ownsTournament = ownsTournament;
 
-            var userTeamsInTournament = _context.TournamentTeam.Where(m => m.Team.OwnerId == currentUser.Id).ToList();
-            var userTeamIdsInTournament = new List<int>();
-            foreach (TournamentTeam tTeam in userTeamsInTournament)
+            var tournaments = _context.Tournament;
+            var applicableTeams = new Dictionary<int, SelectList>();
+            foreach (Tournament tournament in tournaments)
             {
-                userTeamIdsInTournament.Add(tTeam.TeamId);
-            }
-
-            var userTeams = _context.Team.Where(m => m.OwnerId == currentUser.Id).ToList();
-            var filteredUserTeamIds = new List<int>();
-            foreach(Team team in userTeams)
-            {
-                if (!userTeamIdsInTournament.Contains(team.TeamId)) {
-                    filteredUserTeamIds.Add(team.TeamId);
+                var userTeamsInTournament = _context.TournamentTeam.Where(m => m.Team.OwnerId == currentUser.Id && m.TournamentId == tournament.Id).ToList();
+                var userTeamIdsInTournament = new List<int>();
+                foreach (TournamentTeam tTeam in userTeamsInTournament)
+                {
+                    userTeamIdsInTournament.Add(tTeam.TeamId);
                 }
-            }
-            var selectTeamList = _context.Team.Where(m => filteredUserTeamIds.Contains(m.TeamId)).ToList();
 
-            ViewData["TeamId"] = new SelectList(selectTeamList, "TeamId", "Name", myTeam.TeamId);
+                var userTeams = _context.Team.Where(m => m.OwnerId == currentUser.Id).ToList();
+                var filteredUserTeamIds = new List<int>();
+                foreach (Team team in userTeams)
+                {
+                    if (!userTeamIdsInTournament.Contains(team.TeamId))
+                    {
+                        filteredUserTeamIds.Add(team.TeamId);
+                    }
+                }
+                var selectTeamList = _context.Team.Where(m => filteredUserTeamIds.Contains(m.TeamId)).ToList();
+
+                applicableTeams.Add(tournament.Id, new SelectList(selectTeamList, "TeamId", "Name", myTeam.TeamId));
+                //ViewData["TeamId"] = new SelectList(selectTeamList, "TeamId", "Name", myTeam.TeamId);
+            }
+
+            ViewData["ApplicableTeams"] = applicableTeams;
 
             return View(tournamentList);
         }
