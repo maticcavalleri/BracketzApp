@@ -24,6 +24,8 @@ namespace BracketzApp
 
         public IConfiguration Configuration { get; }
 
+        // DbContextOptionsBuilder<ApplicationDbContext> optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
