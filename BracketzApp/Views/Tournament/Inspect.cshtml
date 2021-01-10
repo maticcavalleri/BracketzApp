@@ -8,18 +8,27 @@
 }
 <h2>Tournament</h2>
 
-<h3>Signed up teams:</h3>
-@foreach (var team in ViewBag.teams)
-{
-    <div>
-        <a href="@Url.Action("Details", "Team", new RouteValueDictionary{ {"id", @team.TeamId} } )">@team.Name</a>
-    </div>
-}
+<div>
+    <h3>Signed up teams:</h3>
 
-<form asp-controller="Tournament" asp-action="Generate" method="POST">
-    <input type="hidden" name="TournamentId" value="@this.Model.Id"/>
-    <input class="btn btn-primary" type="submit" value="Generate brackets" />
-</form>
+    <ul class="list-inline">
+        @foreach (var team in ViewBag.teams)
+        {
+        <li class="list-inline-item">
+            <a href="@Url.Action("Details", "Team", new RouteValueDictionary{ {"id", @team.TeamId} } )">@team.Name</a>
+        </li>            
+        }
+    </ul>
+
+    <div class="mt-3">
+        <form asp-controller="Tournament" asp-action="Generate" method="POST">
+            <input type="hidden" name="TournamentId" value="@this.Model.Id" />
+            <input id="generate" class="btn btn-primary" type="submit" value="Generate brackets" />
+        </form>
+        <p id="nOfTeamsMessage" style="visibility: hidden">Number of teams must be power of 2 to generate brackets.</p>
+    </div>
+</div>
+
 <div id="drawContainer">
     <canvas id="drawCanvas" width="1200" height="800">
     </canvas>
@@ -28,6 +37,24 @@
 </div>
 
 <script>
+
+let ctrls = document.getElementById("controls");
+
+function powerOfTwo(x) {
+    return ((x != 0) && !(x & (x - 1)));
+}
+
+let msg = document.getElementById("nOfTeamsMessage");
+let nOfTeams = @ViewBag.Teams.Count;
+let isPowerOfTwo = powerOfTwo(nOfTeams);
+console.log(isPowerOfTwo);
+if (!isPowerOfTwo || nOfTeams < 2) {
+    let button = document.getElementById("generate");
+    button.disabled = true;
+    msg.style.visibility = "visible";
+} else {
+    msg.style.visibility = "hidden";
+}
 
 // parse data from C# to JS object
 let temp_brackets = [];
@@ -90,16 +117,13 @@ for (let i = 0; i < temp_brackets.length; i++) {
 }
 console.log(brackets);
 
-let ctrls = document.getElementById("controls");
+let round = 1;
+let drawHeight = canvas.height;
+let drawWidth = canvas.width;
+
 let canvas = document.getElementById("drawCanvas");
 let ctx = canvas.getContext("2d");
 ctx.font = "15px Arial";
-
-let round = 1;
-let drawHeight = canvas.height; // --- hardcoded - should be same as canvas height
-let drawWidth = canvas.width;
-console.log(drawHeight);
-console.log(drawWidth);
 
 drawChildren(0, 1, drawHeight / 2);
 
@@ -113,7 +137,41 @@ function drawChildren(index, round, y) {
     ctx.beginPath();
     ctx.rect((round-1) * xOffset + 5, y - 20, 220, 45);
     ctx.stroke();
-    
+    var addTeam1 = document.createElement('button');
+    ctrls.appendChild(addTeam1);
+    addTeam1.classList.add("canvasButton");
+    addTeam1.style.position = "absolute";
+    addTeam1.classList.add("btn");
+    addTeam1.classList.add("btn-primary");
+    addTeam1.style.zIndex = 2;
+    addTeam1.style.left = (round - 1) * xOffset + 225 + "px";
+    addTeam1.style.height = 24 + "px";
+    addTeam1.style.top = (y - 20 + 2) * -1 + "px";
+    addTeam1.style.width = 24 + "px";
+    addTeam1.innerText = "+";
+
+    var addTeam2 = document.createElement('button');
+    ctrls.appendChild(addTeam2);
+    addTeam2.classList.add("canvasButton");
+    addTeam2.classList.add("btn");
+    addTeam2.classList.add("btn-primary");
+    addTeam2.style.position = "absolute";
+    addTeam2.style.zIndex = 2;
+    addTeam2.style.left = (round - 1) * xOffset + 225 + "px";
+    addTeam2.style.height = 24 + "px";
+    addTeam2.style.top = (y - 20 + 25) * -1 + "px";
+    addTeam2.style.width = 24 + "px";
+    addTeam2.innerText = "+";
+
+    @*var finishBtn = document.createElement('button');
+    ctrls.appendChild(finishBtn);
+    finishBtn.style.position = "absolute";
+    finishBtn.style.zIndex = 2;
+    finishBtn.style.left = (round - 1) * xOffset + 225 + "px";
+    finishBtn.style.height = 23 + "px";
+    finishBtn.style.top = (y - 20) * -1 + "px";
+    finishBtn.innerText = "Complete";*@
+
     if (!(round === Math.log10(brackets.length + 1) / Math.log10(2))) {
         ctx.beginPath();
         ctx.moveTo((round-1) * xOffset + 230, y);
