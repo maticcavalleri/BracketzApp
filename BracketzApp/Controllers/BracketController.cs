@@ -7,22 +7,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
 using BracketzApp.Models;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace BracketzApp.Controllers
 {
     public class BracketController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<BracketController> _logger;
 
-        public BracketController(ApplicationDbContext context)
+        public BracketController(ApplicationDbContext context, ILogger<BracketController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Bracket
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Bracket.Include(b => b.Parent).Include(b => b.Team1).Include(b => b.Team2).Include(b => b.Tournament);
+            var applicationDbContext = _context.Bracket.Include(b => b.Parent).Include(b => b.Tournament);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,8 +42,6 @@ namespace BracketzApp.Controllers
 
             var bracket = await _context.Bracket
                 .Include(b => b.Parent)
-                .Include(b => b.Team1)
-                .Include(b => b.Team2)
                 .Include(b => b.Tournament)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (bracket == null)
@@ -52,8 +56,6 @@ namespace BracketzApp.Controllers
         public IActionResult Create()
         {
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id");
-            ViewData["Team1Id"] = new SelectList(_context.Team, "TeamId", "Name");
-            ViewData["Team2Id"] = new SelectList(_context.Team, "TeamId", "Name");
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game");
             return View();
         }
@@ -63,7 +65,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Team1Id,Team2Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
+        public async Task<IActionResult> Create([Bind("Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
         {
             if (ModelState.IsValid)
             {
@@ -72,8 +74,6 @@ namespace BracketzApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id", bracket.ParentId);
-            ViewData["Team1Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team1Id);
-            ViewData["Team2Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team2Id);
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game", bracket.TournamentId);
             return View(bracket);
         }
@@ -92,10 +92,51 @@ namespace BracketzApp.Controllers
                 return NotFound();
             }
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id", bracket.ParentId);
-            ViewData["Team1Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team1Id);
-            ViewData["Team2Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team2Id);
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game", bracket.TournamentId);
             return View(bracket);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("UpdateScore")]
+        public async Task<IActionResult> UpdateScore([FromForm] BracketScoreUpdateModel bracketScoreUpdateModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(bracketScoreUpdateModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.ScoreTeam1 = bracketScoreUpdateModel.ScoreTeam1;
+                bracket.ScoreTeam2 = bracketScoreUpdateModel.ScoreTeam2;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("MarkFinished")]
+        public async Task<IActionResult> MarkFinished([FromForm] MarkFinishedModel markFinishedModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(markFinishedModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.IsFinished = true;
+                await _context.SaveChangesAsync();
+
+                int winner;
+                if (bracket.ScoreTeam1 > bracket.ScoreTeam2)
+                {
+                    winner = 1;
+                } else
+                {
+                    winner = 2;
+                }
+
+                return Ok(winner);
+            }
+
+            return NotFound();
         }
 
         // POST: Bracket/Edit/5
@@ -103,7 +144,7 @@ namespace BracketzApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Team1Id,Team2Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreTeam1,ScoreTeam2,Index,IsFinished,TournamentId,ParentId")] Bracket bracket)
         {
             if (id != bracket.Id)
             {
@@ -131,8 +172,6 @@ namespace BracketzApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id", bracket.ParentId);
-            ViewData["Team1Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team1Id);
-            ViewData["Team2Id"] = new SelectList(_context.Team, "TeamId", "Name", bracket.Team2Id);
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game", bracket.TournamentId);
             return View(bracket);
         }
@@ -147,8 +186,6 @@ namespace BracketzApp.Controllers
 
             var bracket = await _context.Bracket
                 .Include(b => b.Parent)
-                .Include(b => b.Team1)
-                .Include(b => b.Team2)
                 .Include(b => b.Tournament)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (bracket == null)
