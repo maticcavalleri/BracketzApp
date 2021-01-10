@@ -139,18 +139,16 @@ function drawChildren(index, round, y) {
     ctx.rect((round - 1) * xOffset + 5, y - 20, 220, 45);
     ctx.stroke();
 
-
-
     var addTeam1 = document.createElement('button');
     ctrls.appendChild(addTeam1);
     addTeam1.classList.add("canvasButton");
+    addTeam1.style.position = "absolute";
     addTeam1.classList.add("btn");
     addTeam1.classList.add("btn-primary");
-    addTeam1.style.position = "absolute";
     addTeam1.style.zIndex = 2;
     addTeam1.style.left = (round - 1) * xOffset + 227 + "px";
     addTeam1.style.height = 23 + "px";
-    addTeam1.style.top = (y - 20 + 26) * -1 + "px";
+    addTeam1.style.top = (y - 20 + 15) - 800 + "px";
     addTeam1.style.width = 24 + "px";
     addTeam1.innerText = "+";
 
@@ -177,13 +175,13 @@ function drawChildren(index, round, y) {
     var addTeam2 = document.createElement('button');
     ctrls.appendChild(addTeam2);
     addTeam2.classList.add("canvasButton");
-    addTeam2.style.position = "absolute";
     addTeam2.classList.add("btn");
     addTeam2.classList.add("btn-primary");
+    addTeam2.style.position = "absolute";
     addTeam2.style.zIndex = 2;
     addTeam2.style.left = (round - 1) * xOffset + 227 + "px";
     addTeam2.style.height = 23 + "px";
-    addTeam2.style.top = (y - 20 + 1) * -1 + "px";
+    addTeam2.style.top = (y - 20 + 39) - 800 + "px";
     addTeam2.style.width = 24 + "px";
     addTeam2.innerText = "+";
 
@@ -216,7 +214,7 @@ function drawChildren(index, round, y) {
     finish.style.zIndex = 2;
     finish.style.left = (round - 1) * xOffset - 23 + "px";
     finish.style.height = 47 + "px";
-    finish.style.top = (y + 5) * -1 + "px";
+    finish.style.top = (y - 5) - 800 + "px";
     finish.style.width = 24 + "px";
     finish.innerText = "<";
 
