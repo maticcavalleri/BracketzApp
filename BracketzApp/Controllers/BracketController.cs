@@ -10,6 +10,7 @@ using BracketzApp.Models;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace BracketzApp.Controllers
 {
@@ -93,6 +94,49 @@ namespace BracketzApp.Controllers
             ViewData["ParentId"] = new SelectList(_context.Bracket, "Id", "Id", bracket.ParentId);
             ViewData["TournamentId"] = new SelectList(_context.Tournament, "Id", "Game", bracket.TournamentId);
             return View(bracket);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("UpdateScore")]
+        public async Task<IActionResult> UpdateScore([FromForm] BracketScoreUpdateModel bracketScoreUpdateModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(bracketScoreUpdateModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.ScoreTeam1 = bracketScoreUpdateModel.ScoreTeam1;
+                bracket.ScoreTeam2 = bracketScoreUpdateModel.ScoreTeam2;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("MarkFinished")]
+        public async Task<IActionResult> MarkFinished([FromForm] MarkFinishedModel markFinishedModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(markFinishedModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.IsFinished = true;
+                await _context.SaveChangesAsync();
+
+                int winner;
+                if (bracket.ScoreTeam1 > bracket.ScoreTeam2)
+                {
+                    winner = 1;
+                } else
+                {
+                    winner = 2;
+                }
+
+                return Ok(winner);
+            }
+
+            return NotFound();
         }
 
         // POST: Bracket/Edit/5
