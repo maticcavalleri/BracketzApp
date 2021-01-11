@@ -109,6 +109,12 @@ namespace BracketzApp.Controllers
         [ActionName("Generate")]
         public async Task<IActionResult> InitialBrackets([FromForm] BracketGenerateModel bracketGenerateModel)
         {
+            var existentBrackets = _context.Bracket.Where(m => m.TournamentId == bracketGenerateModel.TournamentId).ToList();
+            if (existentBrackets.Any())
+            {
+                _context.Bracket.RemoveRange(existentBrackets);
+            }
+
             var teams = _context.TournamentTeam
                 .Where(m => m.TournamentId == bracketGenerateModel.TournamentId)
                 .ToList();
