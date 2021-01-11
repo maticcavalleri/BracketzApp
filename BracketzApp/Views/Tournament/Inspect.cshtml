@@ -133,7 +133,6 @@ for (let i = 0; i < temp_brackets.length; i++) {
     let realIndex = temp_brackets[i]["Index"];
     brackets[realIndex] = temp_brackets[i];
 }
-console.log(brackets);
 
 let canvas = document.getElementById("drawCanvas");
 let ctx = canvas.getContext("2d");
@@ -143,7 +142,7 @@ let round = 1;
 let drawHeight = canvas.height;
 let drawWidth = canvas.width;
 
-drawChildren(0, 1, drawHeight / 2);
+redraw();
 
 function redraw() {
     while (ctrls.firstChild) {
@@ -151,6 +150,7 @@ function redraw() {
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawChildren(0, 1, drawHeight / 2);
+    console.log(brackets);
 }
 
 function drawChildren(index, round, y) {
@@ -259,12 +259,21 @@ function drawChildren(index, round, y) {
             },
             data: {
                 BracketId: brackets[index]["Id"],
-                ParentBracketIndex: Math.floor((brackets[index]["Index"] - 1) / 2),
+                ParentBracketIndex: Math.floor((index - 1) / 2),
                 TournamentId: @this.Model.Id
             },
             success: function (msg) {
                 console.log(msg);
                 brackets[index]["IsFinished"] = true;
+                let parentBracket = brackets[Math.floor((index - 1) / 2)];
+                let winner = msg === brackets[index]["Team1"]["TeamId"] ? brackets[index]["Team1"] : brackets[index]["Team2"];
+                if (parentBracket["Team1"]["TeamId"] == null) {
+                    parentBracket["Team1"] = winner;
+                }
+                else if (parentBracket["Team2"]["TeamId"] == null) {
+                    parentBracket["Team2"] = winner;
+                }
+                console.log(parentBracket);
                 redraw();
             }
         });
