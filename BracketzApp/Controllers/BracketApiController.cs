@@ -21,6 +21,71 @@ namespace BracketzApp.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("UpdateScore")]
+        public async Task<IActionResult> UpdateScore([FromForm] BracketScoreUpdateModel bracketScoreUpdateModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(bracketScoreUpdateModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.ScoreTeam1 = bracketScoreUpdateModel.ScoreTeam1;
+                bracket.ScoreTeam2 = bracketScoreUpdateModel.ScoreTeam2;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("MarkFinished")]
+        public async Task<IActionResult> MarkFinished([FromForm] MarkFinishedModel markFinishedModel)
+        {
+            var bracket = await _context.Bracket.FindAsync(markFinishedModel.BracketId);
+            if (bracket != null)
+            {
+                bracket.IsFinished = true;
+                await _context.SaveChangesAsync();
+
+                // get winner id
+                int winnerId;
+                if (bracket.ScoreTeam1 > bracket.ScoreTeam2)
+                {
+                    winnerId = (int)bracket.Team1Id;
+                }
+                else
+                {
+                    winnerId = (int)bracket.Team2Id;
+                }
+
+                // get parent bracket
+                var parentBracket = await _context.Bracket.FirstAsync(x =>
+                    x.Index == markFinishedModel.ParentBracketIndex &&
+                    x.TournamentId == markFinishedModel.TournamentId);
+
+                // if team is already in parent bracket return BadRequest
+                if (parentBracket.Team1Id == winnerId || parentBracket.Team2Id == winnerId)
+                    return BadRequest("winner team is already in parent bracket");
+
+                // insert winner id in parent bracket
+                if (parentBracket.Team1Id == null)
+                {
+                    parentBracket.Team1Id = winnerId;
+                }
+                else if (parentBracket.Team2Id == null)
+                {
+                    parentBracket.Team2Id = winnerId;
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(winnerId);
+            }
+
+            return NotFound();
+        }
+
         // GET: api/BracketApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Bracket>>> GetBracket()
