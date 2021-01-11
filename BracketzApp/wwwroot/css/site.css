@@ -18,12 +18,6 @@ a {
   border-color: #b80f2d;
 }
 
-.btn-finish {
-    color: #fff;
-    background-color: #468053;
-    border-color: #42794f;
-}
-
 .btn-primary:hover {
   background-color: #b80f2d;
   border-color: #9b0d27;
@@ -81,7 +75,7 @@ body {
   line-height: 60px; /* Vertically center the text there */
 }
 
-.btn.btn-primary:disabled {
+.btn.btn-primary:disabled, .btn.btn-success:disabled {
     background-color: grey;
     border-color: black;
 }
