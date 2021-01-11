@@ -220,7 +220,7 @@ function drawChildren(index, round, y) {
     finish.disabled = (brackets[index]["ScoreTeam1"] === brackets[index]["ScoreTeam2"] || brackets[index]["IsFinished"]);
     finish.classList.add("canvasButton");
     finish.classList.add("btn");
-    finish.classList.add("btn-primary");
+    finish.classList.add("btn-success");
     finish.style.position = "absolute";
     finish.style.zIndex = 2;
     finish.style.left = (round - 1) * xOffset - 23 + "px";
