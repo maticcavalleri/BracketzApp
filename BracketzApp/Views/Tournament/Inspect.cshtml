@@ -142,6 +142,8 @@ let round = 1;
 let drawHeight = canvas.height;
 let drawWidth = canvas.width;
 
+let colorWinner = null;
+
 redraw();
 
 function redraw() {
@@ -149,6 +151,11 @@ function redraw() {
         ctrls.removeChild(ctrls.lastChild);
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (colorWinner != null) {
+        ctx.font = "28px Arial";
+        ctx.fillText("Tournament winner is: team " + colorWinner, 0, 30);
+        ctx.font = "15px Arial";
+    }
     drawChildren(0, 1, drawHeight / 2);
     console.log(brackets);
 }
@@ -274,6 +281,15 @@ function drawChildren(index, round, y) {
                     parentBracket["Team2"] = winner;
                 }
                 console.log(parentBracket);
+                redraw();
+            }
+        }).always(function () {
+            let winner = msg === brackets[index]["Team1"]["TeamId"] ? brackets[index]["Team1"] : brackets[index]["Team2"];
+            // if final bracket
+            if (Math.floor((index - 1) / 2) === -1) {
+                brackets[index]["IsFinished"] = true;
+                console.log("TOURNAMENT WINNER IS: " + winner["Name"]);
+                colorWinner = winner["Name"];
                 redraw();
             }
         });
