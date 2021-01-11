@@ -147,6 +147,7 @@ function drawChildren(index, round, y) {
 
     let addTeam1 = document.createElement('button');
     ctrls.appendChild(addTeam1);
+    addTeam1.disabled = (brackets[index]["IsFinished"]);
     addTeam1.classList.add("canvasButton");
     addTeam1.style.position = "absolute";
     addTeam1.classList.add("btn");
@@ -181,6 +182,7 @@ function drawChildren(index, round, y) {
 
     let addTeam2 = document.createElement('button');
     ctrls.appendChild(addTeam2);
+    addTeam2.disabled = (brackets[index]["IsFinished"]);
     addTeam2.classList.add("canvasButton");
     addTeam2.classList.add("btn");
     addTeam2.classList.add("btn-primary");
@@ -218,7 +220,7 @@ function drawChildren(index, round, y) {
     finish.disabled = (brackets[index]["ScoreTeam1"] === brackets[index]["ScoreTeam2"] || brackets[index]["IsFinished"]);
     finish.classList.add("canvasButton");
     finish.classList.add("btn");
-    finish.classList.add("btn-finish");
+    finish.classList.add("btn-primary");
     finish.style.position = "absolute";
     finish.style.zIndex = 2;
     finish.style.left = (round - 1) * xOffset - 23 + "px";
