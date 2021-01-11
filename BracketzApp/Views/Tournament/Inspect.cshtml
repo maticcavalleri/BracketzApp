@@ -21,7 +21,7 @@
     </ul>
 
     <div class="mt-3">
-        <form asp-controller="Tournament" asp-action="Generate" method="POST">
+        <form id="generateForm">
             <input type="hidden" name="TournamentId" value="@this.Model.Id" />
             <input id="generate" class="btn btn-primary" type="submit" value="Generate brackets" />
         </form>
@@ -37,7 +37,26 @@
 </div>
 
 <script>
-let baseUrl = "https://localhost:5001/Bracket/";
+
+   let baseUrl = "https://localhost:5001/";
+
+let generateForm = document.getElementById("generateForm");
+generateForm.addEventListener('submit', event => {
+    event.preventDefault();
+    let t = $("input[name='__RequestVerificationToken']").val();
+    $.ajax({
+        url: baseUrl + "Tournament/Generate",
+        type: 'Post',
+        headers:
+        {
+            "RequestVerificationToken": t
+        },
+        data: $('#generateForm').serialize(),
+        success: function (msg) {
+            location.reload();
+        }
+    });
+});
 
 let ctrls = document.getElementById("controls");
 
@@ -162,7 +181,7 @@ function drawChildren(index, round, y) {
     addTeam1.addEventListener('click', event => {
         let t = $("input[name='__RequestVerificationToken']").val();
         $.ajax({
-            url: baseUrl + "UpdateScore",
+            url: baseUrl + "Bracket/UpdateScore",
             type: 'Post',
             headers:
             {
@@ -197,7 +216,7 @@ function drawChildren(index, round, y) {
     addTeam2.addEventListener('click', event => {
         let t = $("input[name='__RequestVerificationToken']").val();
         $.ajax({
-            url: baseUrl + "UpdateScore",
+            url: baseUrl + "Bracket/UpdateScore",
             type: 'Post',
             headers:
             {
@@ -232,7 +251,7 @@ function drawChildren(index, round, y) {
     finish.addEventListener('click', event => {
         let t = $("input[name='__RequestVerificationToken']").val();
         $.ajax({
-            url: baseUrl + "MarkFinished",
+            url: baseUrl + "Bracket/MarkFinished",
             type: 'Post',
             headers:
             {
