@@ -124,16 +124,37 @@ namespace BracketzApp.Controllers
                 bracket.IsFinished = true;
                 await _context.SaveChangesAsync();
 
-                int winner;
+                // get winner id
+                int winnerId;
                 if (bracket.ScoreTeam1 > bracket.ScoreTeam2)
                 {
-                    winner = (int)bracket.Team1Id;
+                    winnerId = (int)bracket.Team1Id;
                 } else
                 {
-                    winner = (int)bracket.Team2Id;
+                    winnerId = (int)bracket.Team2Id;
+                }
+                
+                // get parent bracket
+                var parentBracket = await _context.Bracket.FirstAsync(x =>
+                    x.Index == markFinishedModel.ParentBracketIndex &&
+                    x.TournamentId == markFinishedModel.TournamentId);
+                
+                // if team is already in parent bracket return BadRequest
+                if (parentBracket.Team1Id == winnerId || parentBracket.Team2Id == winnerId)
+                    return BadRequest("winner team is already in parent bracket");
+                
+                // insert winner id in parent bracket
+                if (parentBracket.Team1Id == null)
+                {
+                    parentBracket.Team1Id = winnerId;
+                }
+                else if (parentBracket.Team2Id == null)
+                {
+                    parentBracket.Team2Id = winnerId;
                 }
 
-                return Ok(winner);
+                await _context.SaveChangesAsync();
+                return Ok(winnerId);
             }
 
             return NotFound();

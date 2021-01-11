@@ -219,6 +219,8 @@ function drawChildren(index, round, y) {
 
     finish.addEventListener('click', event => {
         let t = $("input[name='__RequestVerificationToken']").val();
+        console.log("current bracket index" + index);
+        console.log("parent bracket index" + Math.floor((brackets[index]["Index"] - 1) / 2));
         $.ajax({
             url: baseUrl + "MarkFinished",
             type: 'Post',
@@ -227,10 +229,12 @@ function drawChildren(index, round, y) {
                 "RequestVerificationToken": t
             },
             data: {
-                BracketId: brackets[index]["Id"]
+                BracketId: brackets[index]["Id"],
+                ParentBracketIndex: Math.floor((brackets[index]["Index"] - 1) / 2),
+                TournamentId: @this.Model.Id
             },
             success: function (msg) {
-                console.log(msg);
+                // console.log(msg);
             }
         });
     });
