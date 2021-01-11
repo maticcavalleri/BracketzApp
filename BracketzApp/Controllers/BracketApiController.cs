@@ -22,7 +22,6 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [ActionName("UpdateScore")]
         public async Task<IActionResult> UpdateScore([FromForm] BracketScoreUpdateModel bracketScoreUpdateModel)
         {
@@ -39,7 +38,6 @@ namespace BracketzApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [ActionName("MarkFinished")]
         public async Task<IActionResult> MarkFinished([FromForm] MarkFinishedModel markFinishedModel)
         {
