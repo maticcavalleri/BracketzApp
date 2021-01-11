@@ -205,7 +205,7 @@ function drawChildren(index, round, y) {
 
     let finish = document.createElement('button');
     ctrls.appendChild(finish);
-    finish.disabled = (brackets[index]["ScoreTeam1"] === brackets[index]["ScoreTeam2"] || brackets[index]["IsFinished"])
+    finish.disabled = (brackets[index]["ScoreTeam1"] === brackets[index]["ScoreTeam2"] || brackets[index]["IsFinished"]);
     finish.classList.add("canvasButton");
     finish.classList.add("btn");
     finish.classList.add("btn-finish");
@@ -216,6 +216,24 @@ function drawChildren(index, round, y) {
     finish.style.top = (y - 5) - 800 + "px";
     finish.style.width = 24 + "px";
     finish.innerText = "<";
+
+    finish.addEventListener('click', event => {
+        let t = $("input[name='__RequestVerificationToken']").val();
+        $.ajax({
+            url: baseUrl + "MarkFinished",
+            type: 'Post',
+            headers:
+            {
+                "RequestVerificationToken": t
+            },
+            data: {
+                BracketId: brackets[index]["Id"]
+            },
+            success: function (msg) {
+                console.log(msg);
+            }
+        });
+    });
 
     if (!(round === Math.log10(brackets.length + 1) / Math.log10(2))) {
         ctx.beginPath();

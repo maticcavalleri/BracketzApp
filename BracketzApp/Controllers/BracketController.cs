@@ -127,10 +127,10 @@ namespace BracketzApp.Controllers
                 int winner;
                 if (bracket.ScoreTeam1 > bracket.ScoreTeam2)
                 {
-                    winner = 1;
+                    winner = (int)bracket.Team1Id;
                 } else
                 {
-                    winner = 2;
+                    winner = (int)bracket.Team2Id;
                 }
 
                 return Ok(winner);
