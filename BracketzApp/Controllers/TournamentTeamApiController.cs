@@ -31,7 +31,7 @@ namespace BracketzApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TournamentTeam>> GetTournamentTeam(int id)
         {
-            var tournamentTeam = await _context.TournamentTeam.FindAsync(id);
+            var tournamentTeam = await _context.TournamentTeam.FirstOrDefaultAsync(x => x.TournamentId == id);
 
             if (tournamentTeam == null)
             {

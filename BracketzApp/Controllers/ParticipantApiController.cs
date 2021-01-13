@@ -25,14 +25,14 @@ namespace BracketzApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Participant>>> GetParticipant()
         {
-            return await _context.Participant.ToListAsync();
+            return await _context.Participant.Include(t => t.User).ToListAsync();
         }
 
         // GET: api/ParticipantApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Participant>> GetParticipant(int id)
         {
-            var participant = await _context.Participant.FindAsync(id);
+            var participant = await _context.Participant.Include(t => t.User).FirstOrDefaultAsync(x => x.Id == id);
 
             if (participant == null)
             {

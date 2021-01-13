@@ -88,14 +88,14 @@ namespace BracketzApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Bracket>>> GetBracket()
         {
-            return await _context.Bracket.ToListAsync();
+            return await _context.Bracket.Include(t => t.Team1).Include(t => t.Team2).Include(t => t.Team1.IdentityUser).ToListAsync();
         }
 
         // GET: api/BracketApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Bracket>> GetBracket(int id)
         {
-            var bracket = await _context.Bracket.FindAsync(id);
+            var bracket = await _context.Bracket.Include(t => t.Team1).Include(t => t.Team2).Include(t => t.Team1.IdentityUser).FirstOrDefaultAsync(x => x.Id == id);
 
             if (bracket == null)
             {

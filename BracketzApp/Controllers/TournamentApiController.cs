@@ -25,19 +25,20 @@ namespace BracketzApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tournament>>> GetTournament()
         {
-            return await _context.Tournament.ToListAsync();
+            return await _context.Tournament.Include(t => t.TournamentFormat).Include(t => t.User).ToListAsync();
         }
 
         // GET: api/TournamentApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Tournament>> GetTournament(int id)
         {
-            var tournament = await _context.Tournament.FindAsync(id);
+            var tournament = await _context.Tournament.Include(t => t.TournamentFormat).Include(t => t.User).FirstOrDefaultAsync(x => x.Id == id);
 
             if (tournament == null)
             {
                 return NotFound();
             }
+            
 
             return tournament;
         }

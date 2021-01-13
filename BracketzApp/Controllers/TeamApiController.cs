@@ -25,14 +25,14 @@ namespace BracketzApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeam()
         {
-            return await _context.Team.ToListAsync();
+            return await _context.Team.Include(t => t.IdentityUser).ToListAsync();
         }
 
         // GET: api/TeamApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Team>> GetTeam(int id)
         {
-            var team = await _context.Team.FindAsync(id);
+            var team = await _context.Team.Include(t => t.IdentityUser).FirstOrDefaultAsync(x => x.TeamId == id);
 
             if (team == null)
             {
