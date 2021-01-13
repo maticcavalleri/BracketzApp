@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BracketzApp.Data;
+using Newtonsoft.Json;
 
 namespace BracketzApp.Controllers
 {
@@ -14,31 +15,39 @@ namespace BracketzApp.Controllers
     public class ParticipantTeamApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private JsonSerializerSettings settings;
 
         public ParticipantTeamApiController(ApplicationDbContext context)
         {
             _context = context;
+
+            settings = new JsonSerializerSettings
+            {
+                Formatting = Newtonsoft.Json.Formatting.Indented, // Just for humans
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
         }
 
         // GET: api/ParticipantTeamApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ParticipantTeam>>> GetParticipantTeam()
         {
-            return await _context.ParticipantTeam.ToListAsync();
+            var participantTeams = await _context.ParticipantTeam.Include(t => t.Participant).ToListAsync();
+            return Content(JsonConvert.SerializeObject(participantTeams, settings), "application/json");
         }
 
         // GET: api/ParticipantTeamApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ParticipantTeam>> GetParticipantTeam(int id)
         {
-            var participantTeam = await _context.ParticipantTeam.FirstOrDefaultAsync(x => x.TeamId == id);
+            var participantTeam = await _context.ParticipantTeam.Include(t => t.Participant).FirstOrDefaultAsync(x => x.TeamId == id);
 
             if (participantTeam == null)
             {
                 return NotFound();
             }
 
-            return participantTeam;
+            return Content(JsonConvert.SerializeObject(participantTeam, settings), "application/json");
         }
 
         // PUT: api/ParticipantTeamApi/5
