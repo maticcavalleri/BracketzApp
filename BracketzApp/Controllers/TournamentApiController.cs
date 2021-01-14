@@ -77,7 +77,7 @@ namespace BracketzApp.Controllers
         // POST: api/TournamentApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
+        public async Task<ActionResult<Tournament>> PostTournament([FromForm] Tournament tournament)
         {
             _context.Tournament.Add(tournament);
             await _context.SaveChangesAsync();
