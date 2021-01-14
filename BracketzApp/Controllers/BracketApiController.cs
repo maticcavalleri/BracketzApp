@@ -95,14 +95,14 @@ namespace BracketzApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Bracket>> GetBracket(int id)
         {
-            var bracket = await _context.Bracket.Include(t => t.Team1).Include(t => t.Team2).Include(t => t.Team1.IdentityUser).FirstOrDefaultAsync(x => x.Id == id);
+            var brackets = await _context.Bracket.Include(t => t.Team1).Include(t => t.Team2).Include(t => t.Team1.IdentityUser).Where(m => m.TournamentId == id).ToListAsync();
 
-            if (bracket == null)
+            if (brackets == null)
             {
                 return NotFound();
             }
 
-            return bracket;
+            return Ok(brackets);
         }
 
         // PUT: api/BracketApi/5
